@@ -1,0 +1,50 @@
+Cytoscape overview network
+
+1. Open Cytoscape (3.8.1)
+2. Click "Import Network" button
+3. Select tsv file saved by BE19-08_General_Cytoscape.R script
+4. Define columns:
+	protein = source node
+	geneSys = target node
+	gene    = target node attribute
+	log2fc  = target node attribute
+	q       = target node attribute
+	interaction  = interaction type
+	intcountnode = target node attribute
+	intcountedge = edge attribute
+	intcountrev  = edge attribute
+5. Go to File -> Import -> Styles from file... and select BE19_overview_style.xml
+   Now, select this style in Style tab where it is called "BE19_redblu"
+	This style contains a diverging red-blu color gradient for "log2fc", which is capped as follows:
+		CMYK for -1: 167, 62, 0, 59
+		CMYK for +1: 0, 140, 163, 40
+	The size of the bubbles corresponds with the number of proteins it affects
+6. Remove labels from all nodes except proteins:
+	Go to Filter menu and click hamburger icon to create new filter "All except proteins"
+	Click the "+" button and choose "Degree Filter"
+	Select: "In is between 1 and 297" (make sure slider is at max)
+	-> Now all nodes except the proteins should be selected
+	Go to the Style menu and click on the "Mapping" button for "Label"
+	For column, select "shared name" and for type select "Passthrough Mapping"
+	Now click on the "Bypass" button for "Label"
+	Just enter a space -> this results in an empty label for all selected nodes
+7. For a non-overlapping network, go to Layout -> yFiles Organic Layout
+8. For a more compact network, go to Layout -> Edge-weighted Spring Embedded
+	 Adjust settings by going to Layout -> Settings... and adjust as follows:
+		Edge column that contains weights: intcountrev
+		How to interpret weight values: 1-normalized value
+		The minimum edge weight to consider: 0
+		The maximum edge weight to consider: 11
+		The default edge weight to consider: 10
+		Average number of iterations for each node: 50
+9. Manually adjust nodes, especially proteins to get a nice look (press cmd to drag-select)
+10. To export network image, go to File -> Export -> Network to image... and export as PDF once with and once without text (check "Export text as font" for both)
+
+
+
+
+
+
+
+
+

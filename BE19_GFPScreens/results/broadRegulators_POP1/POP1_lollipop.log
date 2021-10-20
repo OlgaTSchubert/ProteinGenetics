@@ -1,0 +1,35 @@
+Count only guides that are below 5% FDR
+For sites that were hit by 2 guides, add @5 to increase head size
+For guides that modify two residues, take only the first, so that each mark represents 1 gRNA
+
+
+
+---------------------------------------
+POP1 / P41812 / essential
+---------------------------------------
+
+gRNAs with effect
+H642Y
+G608N
+P372F
+Q336K
+
+gRNAs without effect
+T828I#000000
+P603L#000000@5
+P544L#000000
+G284E#000000
+H251Y#000000
+P222F#000000
+A221V#000000
+R113C#000000
+ S85L#000000
+
+Coding variants between S288C and RM11-1a
+V261A#3d85c6
+F757S#3d85c6
+T862A#3d85c6
+
+
+# Had to add location of Arial.ttf because it didn't find it..
+~/Dropbox/Software/lollipops-v1.5.1-mac64/lollipops -w=500 -legend -domain-labels=off -no-patterns -show-motifs -f /System/Library/Fonts/Supplemental/Arial.ttf -U P41812 H642Y G608N P372F Q336K T828I#000000 P603L#000000@5 P544L#000000 G284E#000000 H251Y#000000 P222F#000000 A221V#000000 R113C#000000 S85L#000000 V261A#3d85c6 F757S#3d85c6 T862A#3d85c6

@@ -1,0 +1,52 @@
+Cytoscape hotspot network
+
+1. Open Cytoscape (3.8.1)
+2. Make sure the stringApp is installed
+3. Go to Apps -> STRING -> Settings and set the defaults:
+	Species: Saccharomyces cerevisiae
+	Confidence cutoff: 0.4
+	Maximum additional interactors: 0
+	Maximum proteins: 100
+	Uncheck all View Defaults
+	Edge channel color palettes: Color Brewer - paired colors
+	Type if chart to draw: Pie Chart
+	Number of terms to chart: 2
+	Change Color Palette: Color Brewer - paired colors
+	Overlap cutoff: 0.5
+4. Restart Cytoscape for changes to take effect
+5. Go again to Apps -> STRING -> Settings and uncheck the remaining check mark
+6. In the Network tab, click on the STRING button and select STRING protein query
+7. Copy paste the 29 hotspot gene names (systematic names) into the field to the right of the STRING button.
+8. Click the search glass button
+9. Go to Apps -> STRING Enrichment -> Retrieve functional enrichment
+	Unselect "Retrieve for selected nodes only"
+	Background: genome
+10. In the lower right, click the STRING Enrichment tab
+11. Click on the filter button, select "GO Process" and check "Remove redundant terms"
+12. Click into the chart color column and remove color for all except the desired GO categories. 
+    Select nice colors for these (e.g., D8B365 & 5AB4AC from https://colorbrewer2.org/#type=diverging&scheme=BrBG&n=3).
+
+13. Go to File > Import > Styles from file... and select BE19_hotspots_style.xml
+   Now, select this style in Style tab where it is called "BE19 Hotspots"
+14. Adjust further if necessary:
+	To change the default color of all nodes except the highlighted ones, go to the Style -> Node -> Fill Color > RGB: D8D8D8 
+    Remove the mapping and bypasses if present.
+	To change the border paint and size, set RGB to 4F4F4F and width to 1.0
+	To change the node size, check "Lock node width and height" and set size to 50
+15. To remove the background color, go to Style -> Network -> Background Paint: under HSV tab, move transparency slider to 100
+16. To change the layout, go to Layout -> yFiles Organic Layout
+17. Manually adjust nodes to get a nice look
+18. To align selected nodes, go to Layout Tools in the lower left corner, select nodes to be aligned and click the appropriate buttons
+18. To export network image, go to File -> Export -> Network to image... and export as PDF once with and once without labels (check "Export text as font" for both)
+19. Save style by going to File -> Export -> Styles to file...
+
+
+Nice colors:
+none:         D8D8D8 (grey)
+up:           D7604D (red)
+down:         4394C4 (blue)
+essential:    698B69 (darkseagreen4)
+nonessential: 9BCD9B (darkseagreen3)
+ribo:         orange
+tRNA:         lilac
+

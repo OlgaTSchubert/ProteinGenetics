@@ -1,0 +1,69 @@
+protein_properties.tab:
+
+Contains basic protein information about each ORF in SGD such as
+predicted molecular weight, protein length, codon bias, etc. This file
+does not include information on deleted or merged ORFs. Note, however,
+that it includes ORFs of all other classifications (Verified,
+Uncharacterized, and Dubious). This file is updated when there is a
+new genome release.
+
+Last Modified: 26 Jan 2015 for genome release R64-2-1.
+
+The columns are below; only the first column is mandatory.  The
+column designated by an amino acid is the number of that particular
+residue in the protein sequence.  For example, if the ALA column is 2,
+then the protein contains 2 alanines.
+
+
+Columns in protein_properties.tab:
+
+ORF (Systematic Name)
+Mw (Molecular Weight)
+PI (Isoelectric Point)
+Protein Length
+N_term_seq
+C_term_seq
+GRAVY Score (Hydropathicity of Protein)
+Aromaticity Score (Frequency of aromatic amino acids: Phe, Tyr, Trp)
+CAI (Codon Adaptation Index)
+Codon Bias
+FOP Score (Frequency of Optimal Codons)>
+Ala
+Cys
+Asp
+Glu
+Phe
+Gly
+His
+Ile
+Lys
+Leu
+Met
+Asn
+Pro
+Gln
+Arg
+Ser
+Thr
+Val
+Trp
+Tyr
+CARBON
+HYDROGEN
+NITROGEN
+OXYGEN
+SULPHUR
+INSTABILITY INDEX (II)
+ASSUMING ALL CYS RESIDUES APPEAR AS HALF CYSTINES
+ASSUMING NO CYS RESIDUES APPEAR AS HALF CYSTINES
+ALIPHATIC INDEX
+
+
+For information about how protein_info data were generated, see the 
+Help page for the Protein Information page at:
+
+http://www.yeastgenome.org/help/protein_page.html
+
+For the Oracle database schema and specifications for SGD, please refer to:
+
+http://www.yeastgenome.org/cgi-bin/viewSchema.pl

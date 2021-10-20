@@ -1,0 +1,9 @@
+saccharomyces_cerevisiae.gff :
+
+This file contains sequence features of Saccharomyces cerevisiae and
+related information such as GO annotation. It is fully compatible with
+Generic Feature Format Version 3
+(http://www.sequenceontology.org/gff3.shtml). It is updated nightly.
+
+This is a standard format used by many groups.  It is used by SGD to
+load the GBrowse resource.

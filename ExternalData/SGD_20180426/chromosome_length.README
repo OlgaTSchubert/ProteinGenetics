@@ -1,0 +1,11 @@
+chromosome_length.tab :
+
+The latest version of the chromosome_length.tab file is based on Genome Version R64-2-1.
+
+Columns are:
+
+1) chromosome
+2) NCBI RefSeq accession number
+3) length
+
+Note that chromosome 17 is the mitochondrial chromosome.

@@ -1,0 +1,23 @@
+biochemical_pathways.tab
+
+This file is created weekly.  It is TAB delimited and contains a list of the pathways in the Yeast Biochemical Pathway Database 
+(YeastCyc) along with the names of the enzymes that catalyze reactions in the pathway , E.C. numbers for 
+the reactions, gene names for the genes that encode for the enzymes and references for the pathways.
+
+This file is updated weekly.
+
+Columns are:				Contents:
+
+1) biochemical pathway common name 	- name of the biochemical pathway, as stored in SGD
+	(mandatory)
+2) enzyme name (optional)		- name of a specific enzyme (may be single or multi subunit)
+3) E.C number of reaction (optional)	- Enzyme Commission identifier of the reaction, e.g. EC:1.1.1.1
+4) gene name (optional)			- Gene name for the enzyme catalyzing the reaction, if identified
+5) reference (optional)	                - if the pathway has been curated from the literature, the SGDID 
+                                          of the reference (prefaced by SGD_REF:) or the Pubmed ID 
+                                          of the reference (prefaced by PMID:)  will be listed
+
+For a complete set of all of the files required to install the Yeast Biochemical Pathway Database (YeastCyc), 
+download the latest yeastcyc15_YYYYMM.tar compressed archive.
+
+

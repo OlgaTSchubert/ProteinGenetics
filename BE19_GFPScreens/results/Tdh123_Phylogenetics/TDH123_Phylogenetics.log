@@ -1,0 +1,65 @@
+1. Compile fasta file for TDH1, TDH2, TDH3 and their orthologs with sequence information from YGOB (http://ygob.ucd.ie/).
+2. On YGOB, include all strains pre/post WGD and do the following for each of the three TDH genes:
+	Export nt or aa sequences (not aligned) by clicking "nt" or "aa" at the top of gene column in YGOB.
+3. Copy and paste these sequences into a text editor and save as new fasta file.
+4. In text editor, create new fasta by pasting together the 4 sequences from the TDH1 fasta and the 26 sequences from the TDH2/3 fastas (these are identical).
+5. Clean up files before continuing:
+	nt: Shorten headers by removing everything after first space: 
+		sed -i "" 's/ .*//g' YGOB_TDH123_nt.fasta
+	nt: Replace some of the headers to get consistent naming:
+		sed -i "" 's/YJL052W/Scer_YJL052W_TDH1/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/YGR192C/Scer_YGR192C_TDH3/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/YJR009C/Scer_YJR009C_TDH2/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/CAGL0G09383g/Cgla_G09383/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/KAFR0E01870/Kafr_E01870/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/KAFR0C06190/Kafr_C06190/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/KNAG0G00880/Knag_G00880/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/NCAS0A07140/Ncas_A07140/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/NCAS0D01840/Ncas_D01840/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/NDAI0D02170/Ndai_D02170/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/NDAI0C02940/Ndai_C02940/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/TBLA0H02450/Tbla_H02450/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/TBLA0B07730/Tbla_B07730/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/TPHA0A04720/Tpha_A04720/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/ZYRO0G12012g/Zrou_G12012/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/TDEL0E04750/Tdel_E04750/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/KLLA0A11858g/Klac_A11858/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/SAKL0G14102g/Sklu_G14102/g' YGOB_TDH123_nt.fasta
+		sed -i "" 's/KLTH0B01958g/Kthe_B01958/g' YGOB_TDH123_nt.fasta
+		
+	aa: Remove all stop codons (*): 
+		sed -i "" 's/\*//g' YGOB_TDH123_aa.fasta
+	aa: Shorten headers by removing everything after first space: 
+		sed -i "" 's/ .*//g' YGOB_TDH123_aa.fasta
+	aa: Replace some of the headers to get consistent naming:
+		sed -i "" 's/YJL052W/Scer_YJL052W_TDH1/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/YGR192C/Scer_YGR192C_TDH3/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/YJR009C/Scer_YJR009C_TDH2/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/CAGL0G09383g/Cgla_G09383/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/KAFR0E01870/Kafr_E01870/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/KAFR0C06190/Kafr_C06190/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/KNAG0G00880/Knag_G00880/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/NCAS0A07140/Ncas_A07140/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/NCAS0D01840/Ncas_D01840/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/NDAI0D02170/Ndai_D02170/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/NDAI0C02940/Ndai_C02940/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/TBLA0H02450/Tbla_H02450/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/TBLA0B07730/Tbla_B07730/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/TPHA0A04720/Tpha_A04720/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/ZYRO0G12012g/Zrou_G12012/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/TDEL0E04750/Tdel_E04750/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/KLLA0A11858g/Klac_A11858/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/SAKL0G14102g/Sklu_G14102/g' YGOB_TDH123_aa.fasta
+		sed -i "" 's/KLTH0B01958g/Kthe_B01958/g' YGOB_TDH123_aa.fasta
+
+6. For both aa and nt fasta files, remove Skud_7.527 because there is a problem with the sequence.
+
+7. To align the nt/aa sequences, use MUSCLE (https://www.ebi.ac.uk/Tools/msa/muscle/)
+	Upload the combined fasta file and choose as output format Pearson/FASTA
+
+8. Once the alignment is done, click the Download Alignment File button and save the aligned sequences into a new fasta file.
+
+9. Then go to the Phylogenetic Tree tab and copy-paste the phylogenetic tree information into a new file.
+
+10. Visualize this tree file using iTOL (https://itol.embl.de/upload.cgi)
+	Save as svg, then open in browser and save as pdf.
