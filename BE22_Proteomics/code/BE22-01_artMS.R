@@ -13,25 +13,52 @@ setwd("./BE22_Proteomics/")
 getwd()
 
 
-# Results directory
+# Functions
+source("../BE00_gRNALibraryDesign/code/BE00-00_ImportExtData.R")
+
+
+# artMS results directory
 resdir <- "results/artMS/"
 dir.create(resdir)
 
 
-# QC results directory
-qcdir <- "results/02_artMS_v4_QC/"
+# artMS QC results directory
+qcdir <- "results/artMS/QC/"
 dir.create(qcdir)
 
 
-# artMS input files
-read.delim2("results/01_MaxQuant_v4/evidence.txt") %>% 
-        filter(!str_detect(Proteins, ";")) %>%
-        write_delim("results/01_MaxQuant_v4/evidence_uniqueOnly.txt", delim = "\t")
-evidencefile  <- "results/01_MaxQuant_v4/evidence_uniqueOnly.txt"
-summaryfile   <- "results/01_MaxQuant_v4/summary.txt"
-configfile    <- "results/02_artMS_shared/config_v4_all_quantile.yaml"  # To get config template: artmsWriteConfigYamlFile()
-keysfile      <- "results/02_artMS_shared/keys.txt"
-contrastsfile <- "results/02_artMS_shared/contrasts_all.txt"
+# MaxQuant files and results directory
+mqdir <- "results/MaxQuant/"
+dir.create(mqdir)
+# Now manually copy evidence.txt and summary.txt from MQ into this folder
+
+evidencefile_all <- "results/MaxQuant/evidence.txt"
+evidencefile     <- "results/MaxQuant/evidence_uniqueOnly.txt"
+summaryfile      <- "results/MaxQuant/summary.txt"
+
+
+# Import MaxQuant output and filter for unique peptides only
+evid_all <- read.delim2(evidencefile_all)
+evid     <- evid_all %>% filter(!str_detect(Proteins, ";"))
+write_delim(evid, evidencefile, delim = "\t")
+
+
+# artMS files
+configfile    <- "code/BE22-01_artMS_config.yaml"  # To get config template: artmsWriteConfigYamlFile()
+keysfile      <- "code/BE22-01_artMS_keys.txt"
+contrastsfile <- "code/BE22-01_artMS_contrasts.txt"
+
+
+# Gene annotations from Uniprot and SGD
+sgd <- importExtData(dataset = "SGD_features", localfile = T) %>%
+        select(Feature_name, Standard_gene_name) %>%
+        dplyr::rename(geneSys = Feature_name, 
+                      gene    = Standard_gene_name) %>%
+        mutate(gene = ifelse(is.na(gene), geneSys, gene)) %>% print()
+
+
+# Proteins and mutations lists
+muts  <- read_delim("annotations/MutationLookup.tsv", delim = "\t") %>% print()
 
 
 
@@ -117,12 +144,12 @@ artmsQuantification(yaml_config_file = configfile,
 # However, when loading the library (library(org.Sc.sgd.db)) and running the command,
 # there is an error regarding a missing column "SYMBOL". Indeed there is no such
 # column in the yeast db file: # columns(org.Sc.sgd.db)
-# Had to remove.packages("org.Sc.sgd.db") and restart R before I could run it again.
+# Had to remove.packages("org.Sc.sgd.db") and restart R before runing it again.
 
 ?artmsAnalysisQuantifications
 artmsAnalysisQuantifications(
-        log2fc_file  = paste0(resdir, "results.txt"),
-        modelqc_file = paste0(resdir, "results_ModelQC.txt"),
+        log2fc_file  = paste0(resdir, "artMS_results.txt"),
+        modelqc_file = paste0(resdir, "artMS_results_ModelQC.txt"),
         output_dir   = "results",
         
         # Enrichment - only for HUMAN or MOUSE
@@ -154,34 +181,31 @@ artmsAnalysisQuantifications(
 
 
 # Reformatting artMS output to wide table --------------------------------------
-# The pre-printed results-summary.xlsx contains 0 instead of NA for 
-# log2FC and p-values of missing comparisons - misleading!)
 
-res <- read.delim2(paste0(resdir, "results_adjpvalue/results-log2fc-long.txt")) %>% 
-        as_tibble() %>% 
-        mutate(mutant = str_sub(Comparison, 1, -4)) %>%
-        left_join(sgd, by = c("Protein" = "geneSys")) %>%
-        mutate(gfp = ifelse(gene %in% prots, T, F),
-               adj.pvalue = ifelse(is.na(pvalue), NA, adj.pvalue)) %>%
-        select(Protein, gene, gfp, Description, mutant, log2FC, adj.pvalue, 
+res <- read_delim(paste0(resdir, "results_adjpvalue/artMS_results-log2fc-long.txt"), delim = "\t") %>% 
+        as_tibble() %>%
+        rename(geneSys  = "Protein") %>%
+        left_join(sgd, by = "geneSys") %>%
+        mutate(mutant = str_sub(Comparison, 1, -4)) %>% 
+        mutate(adj.pvalue = ifelse(is.na(pvalue), NA, adj.pvalue)) %>%
+        select(geneSys, gene, mutant, log2FC, adj.pvalue, 
                iLog2FC, iPvalue) %>%
-        rename(geneSys  = "Protein", 
-               descr    = "Description",
-               log2FC   = "log2FC",
+        rename(log2FC   = "log2FC",
                log2FC.i = "iLog2FC",
                adj.p    = "adj.pvalue",
                adj.p.i  = "iPvalue") %>%
         mutate_at(vars(log2FC, log2FC.i, adj.p, adj.p.i), list(as.numeric)) %>%
         print()
+write_delim(res, paste0(resdir, "artMS_results_OS.tsv"), delim = "\t")
 
 res.wide <- res %>%
-        mutate(mutant = factor(mutant, levels = muts)) %>%
+        mutate(mutant = factor(mutant, levels = muts$alt)) %>%
         arrange(mutant) %>%
         pivot_wider(names_from = mutant,
                     names_sep = "_",
                     values_from = c(log2FC, adj.p, log2FC.i, adj.p.i),
                     values_fill = NA) %>% print()
-write_delim(res.wide, paste0(resdir, "artMS_results_OS.tsv"), delim = "\t")
+write_delim(res.wide, paste0(resdir, "artMS_results_OS_wide.tsv"), delim = "\t")
 
 
 

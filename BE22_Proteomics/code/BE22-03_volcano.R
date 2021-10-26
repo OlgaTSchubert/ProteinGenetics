@@ -12,10 +12,6 @@ setwd("./BE22_Proteomics/")
 getwd()
 
 
-# Functions
-source("../BE19_GFPScreens/code/BE19-00_ImportExtData.R")
-
-
 # Results directory
 resdir <- "results/volcano/"
 dir.create(resdir)
@@ -25,55 +21,17 @@ dir.create(resdir)
 stringdir <- "results/STRING-enrichments/"
 
 
-# Import artMS results
-d0  <- read.delim2("results/artMS/results_adjpvalue/results-log2fc-long.txt") %>% 
-        as_tibble() %>% print()
+# Import and reformat artMS results
+d <- read_delim("results/artMS/artMS_results_OS.tsv", delim = "\t") %>%
+        mutate(adj.p.i = ifelse(is.na(adj.p), 1E-10, adj.p.i)) %>%
+        select(geneSys, gene, mutant, log2FC.i, adj.p.i) %>%
+        mutate(gene = str_to_title(gene),
+               sig  = (abs(log2FC.i) > 1 & adj.p.i < 0.05)) %>%
+        print()
 
 
 # Import annotations
 annot <- read_tsv("annotations/volcanoLabels.tsv") %>% print()
-
-
-# Import gene annotations
-sgd <- importExtData(dataset = "SGD_features", localfile = T) %>%
-        dplyr::rename(geneSys = Feature_name, 
-                      gene = Standard_gene_name) %>% 
-        mutate(gene = ifelse(is.na(gene), geneSys, gene)) %>% 
-        select(geneSys, gene) %>% print()
-
-
-
-
-# Reformat data ----------------------------------------------------------------
-
-# With imputed missing values
-d <- d0 %>%
-        mutate(mutant = str_sub(Comparison, 1, -4)) %>%
-        mutate(iPvalue = ifelse(imputed == "yes", 1E-10, iPvalue)) %>%
-        left_join(sgd, by = c("Protein" = "geneSys")) %>%
-        select(Protein, gene, mutant, iLog2FC, iPvalue) %>%
-        rename(geneSys = Protein,
-               log2fc  = iLog2FC,
-               q       = iPvalue) %>%
-        mutate(gene    = str_to_title(gene),
-               log2fc  = as.numeric(log2fc),
-               q       = as.numeric(q),
-               sig     = (abs(log2fc) > 1 & q < 0.05)) %>%
-        print()
-
-# Without imputed missing values - if using these, also do enrichments on non-imputed data
-# d <- d0 %>%
-#         filter(imputed == "no") %>%
-#         mutate(mutant = str_sub(Comparison, 1, -4)) %>%
-#         left_join(sgd, by = c("Protein" = "geneSys")) %>%
-#         select(Protein, gene, mutant, log2FC, adj.pvalue) %>%
-#         rename(geneSys = Protein,
-#                log2fc  = log2FC,
-#                q       = adj.pvalue) %>%
-#         mutate(log2fc  = as.numeric(log2fc),
-#                q       = as.numeric(q),
-#                sig     = (abs(log2fc) > 1 & q < 0.05)) %>%
-#         print()
 
 
 
@@ -149,10 +107,10 @@ volcanoPlot <- function(dat, mut, labs, hits = c(), outname) {
                         mutate(lab = ifelse(is.na(term), NA, paste0(descr, " (FDR = ", fdr, ")")),
                                lab = factor(lab),
                                lab = fct_reorder(lab, priority)) %>%
-                        mutate(negLogQ = -log10(q),
+                        mutate(negLogQ = -log10(adj.p.i),
                                negLogQ = ifelse(negLogQ > 10, 10, negLogQ)) %>%
                         arrange(-priority) %>% 
-                        ggplot(aes(x = log2fc, y = negLogQ)) +
+                        ggplot(aes(x = log2FC.i, y = negLogQ)) +
                         geom_point(data = . %>% filter(is.na(lab)), color = "gray80") +
                         geom_point(data = . %>% filter(!is.na(lab)), aes(color = lab)) +
                         ggrepel::geom_text_repel(data = . %>% filter(gene %in% hits),
@@ -180,10 +138,8 @@ volcanoPlot <- function(dat, mut, labs, hits = c(), outname) {
 
 
 # Combined plot for POP1, SAP155, SIT4
-egg::ggarrange(plots = list(POP1_plot, SAP155_plot, SIT4_plot),
-          ncol = 1, heights = c(1, 1, 1),
-          labels = c("POP1 H642Y", "SAP155 W702*", "SIT4 Q184*"))
-ggsave(paste0(resdir, "Combined_volcano.pdf"), width = 8, height = 10)
+all <- egg::ggarrange(plots = list(POP1_plot, SAP155_plot, SIT4_plot))
+ggsave(all, filename = paste0(resdir, "Combined_volcano.pdf"), width = 8, height = 8)
 
 
 

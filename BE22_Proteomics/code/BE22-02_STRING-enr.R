@@ -24,8 +24,7 @@ muts  <- read_delim("annotations/MutationLookup.tsv", delim = "\t") %>%
 
 
 # Import artMS results
-res <- read_delim("results/artMS/artMS_results_OS.txt", delim = "\t") %>% 
-        as_tibble() %>% print()
+res <- read_delim("results/artMS/artMS_results_OS_wide.tsv", delim = "\t") %>% print()
 
 
 
@@ -36,7 +35,7 @@ res <- read_delim("results/artMS/artMS_results_OS.txt", delim = "\t") %>%
 string_db <- STRINGdb$new(version = "11", 
                           species = 4932,
                           score_threshold = 400, 
-                          input_directory = "~/Dropbox/Lab_Kruglyak/RESOURCES/STRING/")
+                          input_directory = "../ExternalData/STRING/")
 
 
 # Add STRING identifiers to results (doesn't work on tibble)
@@ -98,8 +97,6 @@ for (i in seq_along(names(enr))) {
                 mutate_at(vars(number_of_genes, number_of_genes_in_background, ncbiTaxonId), list(as.integer)) %>%
                 mutate_at(vars(p_value, fdr), list(as.double))
 }
-saveRDS(enr, paste0(resdir, "enr_list.RDS"))
-#enr <- readRDS(paste0(resdir, "enr_list.RDS"))
 
 
 # Write individual files with enrichments

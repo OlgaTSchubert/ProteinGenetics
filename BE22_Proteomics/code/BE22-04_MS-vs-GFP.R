@@ -13,7 +13,7 @@ getwd()
 
 
 # Functions
-source("../BE19_GFPScreens/code/BE19-00_ImportExtData.R")
+source("../BE00_gRNALibraryDesign/code/BE00-00_ImportExtData.R")
 
 
 # Results directory
@@ -22,19 +22,32 @@ dir.create(resdir)
 
 
 # Import results from base editor screens (guide-level, not gene-level)
-gfp0 <- readRDS("../BE19_GFPScreens/results/processing/combdf_gd.RDS") %>% print()
+gfp <- readRDS("../BE19_GFPScreens/results/processing/combdf_gd.RDS") %>% 
+        select(guide, gene, Eno2_log2fc:Yhb1_q) %>%
+        filter(guide %in% muts$guide) %>%
+        pivot_longer(-c(guide, gene), 
+                     names_to = c("protein", ".value"),
+                     names_pattern = "(.+)_(.+)") %>%
+        mutate(protein = toupper(protein)) %>%
+        rename(GFP_log2fc = log2fc,
+               GFP_q = q) %>% print()
 
 
-# Import results from proteomics
-ms0  <- read_delim("results/artMS/results_adjpvalue/results-log2fc-long.txt", "\t") %>% 
-        as_tibble() %>% print()
+# Import and reformat artMS results
+ms <- read_delim("results/artMS/artMS_results_OS.tsv", delim = "\t") %>%
+        mutate(adj.p.i = ifelse(is.na(adj.p), 1E-10, adj.p.i)) %>%
+        filter(gene %in% prots) %>%
+        rename(protein    = gene,
+               MS_log2fc  = log2FC,
+               MS_q       = adj.p,
+               MS_log2fci = log2FC.i,
+               MS_qi      = adj.p.i) %>% 
+        select(-geneSys) %>% print()
 
 
 # Import annotations
-muts  <- read_delim("annotations/MutationLookup.tsv", delim = "\t") %>% 
-        as_tibble %>% print()
-prots <- read_delim("annotations/ProteinLookup.tsv", delim = "\t") %>% 
-        pull(gene) %>% toupper() %>% print()
+muts  <- read_delim("annotations/MutationLookup.tsv", delim = "\t") %>% as_tibble %>% print()
+prots <- read_delim("annotations/ProteinLookup.tsv", delim = "\t") %>% pull(gene) %>% toupper() %>% print()
 
 
 # Import gene annotations
@@ -48,46 +61,14 @@ sgd <- importExtData(dataset = "SGD_features", localfile = T) %>%
 
 
 # Combine data -----------------------------------------------------------------
-
-gfp <- gfp0 %>%
-        select(guide, gene, Eno2_log2fc:Yhb1_q) %>%
-        filter(guide %in% muts$guide) %>%
-        pivot_longer(-c(guide, gene), 
-                     names_to = c("protein", ".value"),
-                     names_pattern = "(.+)_(.+)") %>%
-        mutate(protein = toupper(protein)) %>%
-        rename(GFP_log2fc = log2fc,
-               GFP_q      = q) %>%
-        print()
-
-ms <- ms0 %>%
-        mutate(mutant = str_sub(Comparison, 1, -4)) %>%
-        left_join(sgd, by = c("Protein" = "geneSys")) %>%
-        select(gene, mutant, log2FC, adj.pvalue, imputed, iLog2FC, iPvalue) %>%
-        filter(gene %in% prots) %>%
-        rename(protein    = gene,
-               MS_log2fc  = log2FC,
-               MS_q       = adj.pvalue,
-               MS_log2fci = iLog2FC,
-               MS_qi      = iPvalue) %>%
-        mutate(MS_log2fc  = as.numeric(MS_log2fc),
-               MS_q       = as.numeric(MS_q),
-               MS_log2fci = as.numeric(MS_log2fci),
-               MS_qi      = as.numeric(MS_qi)) %>%
-        print()
+# There is no difference between data with and without imputation
 
 comb <- muts %>%
         left_join(gfp, by = c("guide", "gene")) %>%
         left_join(ms, by = c("alt" = "mutant", "protein")) %>%
-        select(-imputed, -MS_log2fci, -MS_qi) %>%   # no difference, see below
+        select(-MS_log2fci, -MS_qi) %>%   # no difference, see below
         mutate(protein = str_to_title(protein)) %>%
         print()
-
-# No difference between data with and without imputation
-# comb %>% filter(GFP_q < 0.05 & MS_q < 0.05) %>%
-#         ggplot() +
-#         geom_point(aes(x = MS_q, y = MS_qi))
-#         #geom_point(aes(x = MS_log2fc, y = MS_log2fci))
 
 
 
@@ -96,8 +77,8 @@ comb <- muts %>%
 
 # All proteins in POP1
 comb %>%
-        filter(alt %in% c("POP1")) %>%
-        mutate(sig = ifelse(GFP_q < 0.05 & MS_q < 0.05, T, F)) %>%
+        filter(gene %in% c("POP1")) %>%
+        mutate(sig = ifelse(GFP_q < 0.1 & MS_q < 0.1, T, F)) %>%
         ggplot(aes(x = GFP_log2fc, y = MS_log2fc, color = sig)) +
         geom_hline(aes(yintercept = 0), color = "grey") +
         geom_vline(aes(xintercept = 0), color = "grey") +
