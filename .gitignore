@@ -5,37 +5,23 @@
 .Ruserdata
 ProteinGenetics.Rproj
 
-BE00_gRNALibraryDesign/.DS_Store
-BE00_gRNALibraryDesign/*/.DS_Store
+*.DS_Store
 
 BE02_GenomicAmpliconSeq/data/
-BE02_GenomicAmpliconSeq/.DS_Store
-BE02_GenomicAmpliconSeq/*/.DS_Store
 
 BE04_CanavanineScreen/data/
-BE04_CanavanineScreen/.DS_Store
-BE04_CanavanineScreen/*/.DS_Store
 
-BE19_GFPScreen/data/
-BE19_GFPScreen/.DS_Store
-BE19_GFPScreen/*/.DS_Store
+BE19_GFPScreens/data/
 
-BE21_FitnessScreen/data
-BE21_FitnessScreen/.DS_Store
-BE21_FitnessScreen/*/.DS_Store
+BE21_FitnessScreen/data/
 
-BE22_Proteomics/MaxQuant/
-BE22_Proteomics/.DS_Store
-BE22_Proteomics/*/.DS_Store
+BE22_Proteomics/results/MaxQuant/
+BE22_Proteomics/results/artMS/QC
 BE22_Proteomics/artms_sessionInfo_analysisQuant.txt
 BE22_Proteomics/artms_sessionInfo_quantification.txt
 BE22_Proteomics/msstats.log
 BE22_Proteomics/sessionInfo.txt
 
-ExternalData/.DS_Store
-ExternalData/*/.DS_Store
-ExternalData/provean_scores.RDS
+ExternalData/Provean/provean_scores.RDS
 
-
-ProteinGenetics_NotInGitHub
-
+ProteinGenetics_NotInGitHub/
