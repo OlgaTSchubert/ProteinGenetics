@@ -81,6 +81,7 @@ test  <- test  %>% mutate(dropout = ifelse(test$log2fc < -0.5, T, F)) %>% print(
 # Train ordinary lasso model on log2fc
 olasso <- cv.glmnet(x = data.matrix(train.feats), y = train$log2fc)
 saveRDS(olasso, file = paste0(resdir, "lasso_model_ordinary.RDS"))
+olasso <- readRDS(paste0(resdir, "lasso_model_ordinary.RDS"))
 olasso
 plot(olasso)
 
@@ -107,6 +108,7 @@ cor.test(olasso.p, test$log2fc)$estimate^2  # 0.37
 llasso <- cv.glmnet(x = data.matrix(train.feats), y = train$dropout, 
                     family = "binomial", type.measure = "auc")
 saveRDS(llasso, file = paste0(resdir, "lasso_model_logistic.RDS"))
+llasso <- readRDS(paste0(resdir, "lasso_model_logistic.RDS"))
 llasso
 plot(llasso)
 
@@ -151,6 +153,7 @@ chisq.test(ctab)$p.value  # 6e-51
 test %>%
     ggplot(aes(x = log2fc, y = olasso.p)) +
     geom_point() +
+    ggpubr::stat_cor(label.x.npc = "left", label.y.npc = "top") +
     labs(x = "Log2FC", y = "Lasso model") +
     theme_bw() +
     theme(panel.grid.major = element_blank(),
