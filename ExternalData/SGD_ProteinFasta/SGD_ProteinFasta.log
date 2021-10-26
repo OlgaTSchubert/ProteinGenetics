@@ -1,0 +1,8 @@
+Link to protein fasta file: 
+http://sgd-archive.yeastgenome.org/sequence/S288C_reference/orf_protein/archive/orf_trans.20150113.fasta.gz
+
+Fasta file cleanup:
+1. Shorten headers by removing everything after the two gene names (" SGDID.*" replace with "")
+2. Remove stop codons ("\*" replace with "")
+3. Remove double line breaks ("\r\r" replace with "\r")
+4. Save as xxx_mod.fasta

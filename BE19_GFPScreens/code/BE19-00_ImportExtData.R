@@ -245,10 +245,10 @@ importExtData <- function(dataset, localfile = FALSE) {
                         
                         print("There is no download information.")
                         
-                } else { file <- "../ExternalData/Newman_Nature_2006/Newman2006_SuppTable1.csv" }
+                } else { file <- "../ExternalData/Newman_Nature_2006/Newman_Nature_2006_TableS1.csv" }
                 
                 ds   <- readr::read_csv(file, col_names = T, na = c("","NA"))
-                
+
                 
                 
                 
