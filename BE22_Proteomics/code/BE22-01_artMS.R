@@ -124,8 +124,7 @@ artmsQualityControlSummaryExtended(
         plotMSMS = TRUE,
         plotISOTOPE = TRUE,
         printPDF = TRUE,
-        verbose = TRUE
-)
+        verbose = TRUE)
 
 
 
@@ -139,25 +138,15 @@ artmsQuantification(yaml_config_file = configfile,
 
 
 # Further analyses
-# artMS asks to install org.Sc.sgd.db: install.packages('org.Sc.sgd.db')
-# This gave an error (related to R version), but installation from Bioconductor worked.
-# However, when loading the library (library(org.Sc.sgd.db)) and running the command,
-# there is an error regarding a missing column "SYMBOL". Indeed there is no such
-# column in the yeast db file: # columns(org.Sc.sgd.db)
-# Had to remove.packages("org.Sc.sgd.db") and restart R before runing it again.
-
-?artmsAnalysisQuantifications
+#?artmsAnalysisQuantifications
 artmsAnalysisQuantifications(
         log2fc_file  = paste0(resdir, "artMS_results.txt"),
         modelqc_file = paste0(resdir, "artMS_results_ModelQC.txt"),
         output_dir   = "results",
-        
-        # Enrichment - only for HUMAN or MOUSE
-        species = "YEAST",  # This is for enrichment, which currently only supported for HUMAN and MOUSE
+        species = "YEAST",  # This is for enrichment, which is currently only supported for HUMAN and MOUSE
         enrich = FALSE,     # This is automatically disabled for YEAST
         l2fc_thres = 1,
         isBackground = "nobackground",
-        
         outliers = "keep",           # c("keep", "iqr", "std")
         choosePvalue = "adjpvalue",  # c("adjpvalue", "pvalue")
         isPtm = "global",            # c("global", "ptmsites")
@@ -180,7 +169,7 @@ artmsAnalysisQuantifications(
 
 
 
-# Reformatting artMS output to wide table --------------------------------------
+# Reformatting artMS output ----------------------------------------------------
 
 res <- read_delim(paste0(resdir, "results_adjpvalue/artMS_results-log2fc-long.txt"), delim = "\t") %>% 
         as_tibble() %>%
