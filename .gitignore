@@ -6,15 +6,15 @@
 ProteinGenetics.Rproj
 
 BE00_gRNALibraryDesign/.DS_Store
-BE00_gRNALibraryDesign/.*/.DS_Store
+BE00_gRNALibraryDesign/*/.DS_Store
 
 BE02_GenomicAmpliconSeq/data/
 BE02_GenomicAmpliconSeq/.DS_Store
-BE02_GenomicAmpliconSeq/.*/.DS_Store
+BE02_GenomicAmpliconSeq/*/.DS_Store
 
 BE04_CanavanineScreen/data/
 BE04_CanavanineScreen/.DS_Store
-BE04_CanavanineScreen/.*/.DS_Store
+BE04_CanavanineScreen/*/.DS_Store
 
 BE19_GFPScreen/data/
 BE19_GFPScreen/.DS_Store
