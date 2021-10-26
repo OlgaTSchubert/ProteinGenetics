@@ -21,6 +21,7 @@ BE22_Proteomics/artms_sessionInfo_analysisQuant.txt
 BE22_Proteomics/artms_sessionInfo_quantification.txt
 BE22_Proteomics/msstats.log
 BE22_Proteomics/sessionInfo.txt
+BE22_Proteomics/results/artMS/artMS_results-mss-normalized.txt
 
 ExternalData/Provean/provean_scores.RDS
 
