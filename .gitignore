@@ -5,7 +5,7 @@
 .Ruserdata
 ProteinGenetics.Rproj
 
-*.DS_Store
+*DS_Store
 
 BE02_GenomicAmpliconSeq/data/
 
