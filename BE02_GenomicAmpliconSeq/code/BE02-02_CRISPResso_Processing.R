@@ -17,6 +17,10 @@ resdir <- "results/"
 dir.create(resdir)
 
 
+# Tested gRNAs
+gds <- read_tsv("annotations/guides.tsv") %>% print()
+
+
 # CRISPResso2 results file
 resfile <- "Quantification_window_nucleotide_frequency_table.txt"
 
@@ -33,7 +37,8 @@ guides <- str_extract(files, "(?<=\\.\\/).*(?=/CRISPResso_on_)") %>% print()
 
 
 # DNA strand targeted by gRNA
-strand <- tibble(guide = guides, strand = c("f", "r", "r", "r", "r", "f", "f", "r")) %>% print()
+strand <- tibble(guide = guides) %>%
+        left_join(gds)
 
 rev <- strand %>%
         filter(strand == "r") %>%
@@ -44,6 +49,7 @@ fwd <- strand %>%
         filter(strand == "f") %>%
         pull(guide) %>%
         print()
+
 
 
 
@@ -126,19 +132,21 @@ comb <- comblist5 %>%
 
 maxeff <- comb %>%
         filter(type == c("C-to-T")) %>%
-        group_by(guide) %>%
+        left_join(gds) %>%
+        group_by(guide, sequence) %>%
         summarize(fmax = max(f)) %>% print()
 write_csv(maxeff, paste0(resdir, "MaxEfficiency.csv"))
 
-# guide fmax
-# pLK78 48.4 
-# pOS08 85.9 
-# pOS09 67.9 
-# pOS10 28.2 
-# pOS11 36.6 
-# pOS12 58.9 
-# pOS13 83.2 
-# pOS14  6.52
+# guide sequence             fmax
+# pLK78 GATACGTTCTCTATGGAGGA 48.4 
+# pOS08 AAACCAATACATGTAACCAT 85.9 
+# pOS09 ACGTCCAAAATTGAATGACT 67.9 
+# pOS10 CTCCAATAACGGAATCCAAC 28.2 
+# pOS11 GAACCAGAACTCTGACAGTT 36.6 
+# pOS12 TCCTGCCCAGGCCGCTGAGC 58.9 
+# pOS13 AGTTACCCAAAGTGTTCCTG 83.2 
+# pOS14 GCCCATTTTTCGGCGTACAA  6.52
+
 
 
 
@@ -195,7 +203,7 @@ ggsave(paste0(resdir, "EditingWindow_all.pdf"), width = 8, height = 8)
 
 # Selected only (color by type)
 comb %>%
-        filter(orig != edit) %>%
+        filter(orig != edit) %>% 
         filter(pos > -25 & pos < 5) %>%
         ggplot() +
         geom_rect(aes(xmin = -20.5, xmax = -0.5, ymin = 0, ymax = 100),
@@ -215,6 +223,33 @@ comb %>%
               panel.grid.minor = element_blank())
 ggsave(paste0(resdir, "EditingWindow.pdf"), width = 4, height = 3.1)
 ggsave(paste0(resdir, "EditingWindow_wider.pdf"), width = 5, height = 3.1)
+
+
+
+
+# Calculate fraction of edits in expected window (-13 to -17) ------------------
+
+# All edits within guide targeting region (20 nt)
+sumf.all <- comb %>%
+        filter(orig != edit) %>%
+        filter(pos %in% c(-1:-20)) %>%
+        pull(f) %>% sum() %>% print() # 744
+
+# All C-to-T edits in guide targeting region (20 nt)
+sumf.CtoT <- comb %>%
+        filter(type == "C-to-T") %>%
+        filter(pos %in% c(-1:-20)) %>%
+        pull(f) %>% sum() %>% print() # 709
+
+# All C-to-T edits in 5-nt window
+sumf.win5 <- comb %>%
+        filter(type == "C-to-T") %>%
+        filter(pos %in% c(-13:-17)) %>%
+        pull(f) %>% sum() %>% print() # 632
+
+sumf.CtoT/sumf.all   # 95%
+sumf.win5/sumf.all   # 85%
+sumf.win5/sumf.CtoT  # 89%
 
 
 
