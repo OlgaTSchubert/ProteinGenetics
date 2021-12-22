@@ -148,7 +148,7 @@ ggsave(paste0(resdir, "wES_FitnessJitter.pdf"), height = 3, width = 3)
 res5 %>%
         filter(set %in% c("Non-yeast", "No C", "Synonymous", "Ess. stop")) %>%
         group_by(timepoint, set, dropout) %>%
-        summarize(n = n()) %>% #print(n=42)
+        summarize(n = n()) %>%
         ggplot(aes(x = set, y = n, fill = dropout)) +
         geom_col(position = "fill") +
         labs(x = "", y = "Fraction of gRNAs") +
@@ -161,7 +161,30 @@ ggsave(paste0(resdir, "wES_DropoutFraction_ESonly.pdf"), height = 3, width = 4)
 ggsave(paste0(resdir, "wES_DropoutFraction.pdf"), height = 3, width = 6)
 
 
+# Numbers
+res5.sum <- res5 %>%
+        filter(set %in% c("Non-yeast", "No C", "Synonymous", "Ess. stop")) %>% 
+        mutate(set2 = ifelse(set == "Ess. stop", "Ess.stop", "Control")) %>%
+        group_by(timepoint, set2, dropout) %>%
+        summarize(n = n()) %>%
+        ungroup() %>%
+        filter(timepoint == "48 hours") %>%
+        print()
 
+ES.dropout <- res5.sum %>% filter(set2 == "Ess.stop", dropout == T) %>% pull(n)
+ES.notdo <- res5.sum %>% filter(set2 == "Ess.stop", dropout == F) %>% pull(n)
+ES.dropout/(ES.dropout+ES.notdo) # 0.59
+
+res5.sum.red <- res5.sum %>%
+        select(-"timepoint") %>%
+        pivot_wider(names_from = set2, values_from = n) %>%
+        print()
+        
+chisq.test(res5.sum.red[, 2:3])
+# X-squared = 1061, df = 1, p-value < 2.2e-16
+
+
+        
 
 # Session info -----------------------------------------------------------------
 
