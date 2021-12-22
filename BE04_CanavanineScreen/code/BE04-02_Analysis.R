@@ -98,37 +98,74 @@ write_excel_csv(res4, paste0(resdir, "results.csv"))
 # Are guides introducing stop or nonsynonymous mutations more likely to lead to 
 # canavanine resistance than guides introducing synonymous mutations?
 
-table(res4$enriched, res4$consequence)
-#       nonsynonymous synonymous stop
-# FALSE            54         19    2
-# TRUE             11          0    4
-
-4/(2+4)     # 0.67 ( 4 out of  6 stop guides are enriched in Can condition)
-11/(54+11)  # 0.17 (11 out of 65 nonsynonymous guides are enriched in Can condition)
-0/(19+0)    # 0    ( 0 out of 19 synonymous guides are enriched in Can condition)
+table(res4$consequence, res4$enriched)
+#               FALSE TRUE
+# nonsynonymous    54   11
+# synonymous       19    0
+# stop              2    4
 
 
-# Are guides introducing mutations at conserved sites (Provean > 5) more likely
+# Stats by guide count
+res4.add <- res4 %>%
+        mutate(consequence_stop = ifelse(consequence == "stop", T, F),
+               consequence_syn = ifelse(consequence == "synonymous", T, F)) %>%
+        print()
+
+table(res4.add$consequence_stop, res4.add$enriched)
+chisq.test(res4.add$consequence_stop, res4.add$enriched)
+#X-squared = 8.0357, df = 1, p-value = 0.004586
+
+fisher.test(res4.add$consequence_stop, res4.add$enriched)
+# p-value = 0.006454
+
+table(res4.add$consequence_syn, res4.add$enriched)
+chisq.test(res4.add$consequence_syn, res4.add$enriched)
+# X-squared = 3.4159, df = 1, p-value = 0.06457
+
+fisher.test(res4.add$consequence_syn, res4.add$enriched)
+# p-value = 0.03419
+
+
+# Stats by read count
+res4.sum <- res4 %>%
+        pivot_longer(-c(guide, geneSys, gene, mut1, mut2, consequence, provean, maxAbsProvean, enriched), 
+                     names_to = c("time", "condition"),
+                     names_sep = "_",
+                     values_to = "reads") %>%
+        group_by(consequence, condition) %>%
+        summarize(readsum = sum(reads)) %>%
+        pivot_wider(names_from = consequence, values_from = readsum) %>%
+        mutate(notstop = nonsynonymous+synonymous,
+               notsyn  = nonsynonymous+stop) %>%
+        print()
+# condition  nonsynonymous synonymous  stop notstop notsyn
+# Canavanine         32397.      4587. 7007.  36984. 39404.
+# Control            23652.      6803. 1979.  30455. 25631.
+
+chisq.test(res4.sum[, c("stop", "notstop")])
+# X-squared = 1736.8, df = 1, p-value < 2.2e-16
+
+chisq.test(res4.sum[, c("synonymous", "notsyn")])
+# X-squared = 1636.8, df = 1, p-value < 2.2e-16
+
+
+# Are guides introducing mutations at conserved sites (maxAbsProvean > 5) more likely
 # to lead to canavanine resistance?
 res4.ns <- res4 %>%
         filter(consequence == "nonsynonymous") %>%
         mutate(provean5 = ifelse(maxAbsProvean > 5, "hiProv", "loProv")) %>%
         print()
 
-table(res4.ns$enriched, res4.ns$provean5)
-#       hiProv loProv
-# FALSE     11     43
-# TRUE       7      4
+table(res4.ns$provean5, res4.ns$enriched)
+#        FALSE TRUE
+# hiProv    11    7
+# loProv    43    4
 
-7/(11+7)  # 0.39 (7 out of 18 hiProv guides are enriched in Can condition)
-4/(43+4)  # 0.09 (4 out of 47 loProv guides are enriched in Can condition)
+chisq.test(res4.ns$provean5, res4.ns$enriched)
+# X-squared = 6.5191, df = 1, p-value = 0.01067
 
-
-# Among the 11 nonsynonymous guides that are enriched, how many are highly 
-# conserved (Provean > 5)?
-sum(res4.ns$enriched == T & res4.ns$maxAbsProvean > 5)/sum(res4.ns$enriched == T)  # 0.64
-sum(res4.ns$enriched == F & res4.ns$maxAbsProvean > 5)/sum(res4.ns$enriched == F)  # 0.20
-
+fisher.test(res4.ns$provean5, res4.ns$enriched)
+# p-value = 0.007196
 
 
 
