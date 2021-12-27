@@ -36,7 +36,7 @@ gd <- combdf.gd %>%
                      names_sep = "_") %>% 
         mutate(sign = ifelse(log2fc > 0, "positive", "negative")) %>%
         mutate(specificity = case_when(FDR0.05_count < 3 ~ "specific",
-                                       FDR0.05_count > 2 ~ "unspecific",
+                                       FDR0.05_count > 2 ~ "nonspecific",
                                        TRUE ~ NA_character_)) %>%
         filter(q < 0.05) %>% print()
 
@@ -47,14 +47,14 @@ gn <- combdf.gn %>%
                      names_sep = "_") %>% 
         mutate(sign = ifelse(log2fc > 0, "positive", "negative")) %>%
         mutate(specificity = case_when(FDR0.05_count < 3 ~ "specific",
-                                       FDR0.05_count > 2 ~ "unspecific",
+                                       FDR0.05_count > 2 ~ "nonspecific",
                                        TRUE ~ NA_character_)) %>%
         filter(q < 0.05) %>% print()
 
 
 
 
-# Get total and mean counts of significant guides/genes ------------------------
+# Stats on guide-level ---------------------------------------------------------
 
 # Total number of guides with effect
 gd %>%
@@ -82,14 +82,14 @@ gd %>%
 # positive     57 
 
 
-# Mean number of specific/unspecific guides per protein
+# Mean number of specific/nonspecific guides per protein
 gd %>%
         group_by(protein, specificity) %>%
         summarize(n = n()) %>% #print()
         group_by(specificity) %>%        
         summarize(mean = mean(n))
-# specific     84.8
-# unspecific  106.
+# nonspecific  106.
+# specific      84.8
 
 
 # Mean number of guides per protein by set
@@ -117,6 +117,62 @@ gd %>%
 # positive neStops  20.2
 
 
+# Mean number of guides by set
+gd.sum <- combdf.gd %>%
+        mutate(sig = ifelse(FDR0.05_count > 0, T, F)) %>%
+        group_by(set, sig) %>%
+        summarize(n = n()) %>%
+        pivot_wider(names_from = set, values_from = n) %>%
+        print()
+# sig   eProvs neProvs neStops
+# FALSE   4861    5317    5152
+# TRUE     582     157     281
+
+chisq.test(gd.sum[, c("neProvs", "neStops")])
+# p-value = 1.208e-09
+
+
+# Mean log2fc by set and sign
+gd %>%
+        group_by(set, sign) %>%
+        summarize(mean = mean(log2fc),
+                  median = median(log2fc))
+# set     sign      mean median
+# eProvs  negative -1.18 -1.13 
+# eProvs  positive  1.15  0.969
+# neProvs negative -1.06 -0.927
+# neProvs positive  1.09  0.970
+# neStops negative -1.16 -1.12 
+# neStops positive  1.19  1.12 
+
+
+# Mean abs(log2fc) by set
+gd %>%
+        group_by(set) %>%
+        summarize(mean = mean(abs(log2fc)),
+                  median = median(abs(log2fc)))
+# set      mean median
+# eProvs   1.17  1.11 
+# neProvs  1.08  0.960
+# neStops  1.18  1.12 
+
+
+# T-test for abs(log2fc) by set
+neProvs.abs <- gd %>%
+        filter(set == "neProvs") %>%
+        pull(log2fc) %>% abs() %>% print()
+
+neStops.abs <- gd %>% 
+        filter(set == "neStops") %>% 
+        pull(log2fc) %>% abs() %>% print()
+
+t.test(neProvs.abs, neStops.abs, alternative = "two.sided")
+# p-value = 0.002807
+
+
+
+
+# Stats on gene-level ----------------------------------------------------------
 
 # Total number of genes with effect
 gn %>%
@@ -143,15 +199,38 @@ gn %>%
 # negative    106.
 # positive     50 
 
+binom.test(x = 106, n = 156, p = 0.5) 
+# p-value = 8.633e-06
 
-# Mean number of specific/unspecific genes per protein
+
+# Mean number of positive/negative genes per protein, by protein fct
+gn %>%
+        mutate(proteinfct = ifelse(protein %in% c("Tdh1", "Tdh2", "Ssa1", "Yhb1"), "stress", "core")) %>%
+        group_by(proteinfct, protein, sign) %>%
+        summarize(n = n()) %>% #print()
+        group_by(proteinfct, sign) %>%       
+        summarize(mean = mean(n))
+
+# proteinfct sign      mean
+# core       negative 119. 
+# core       positive  33.7
+# stress     negative  83.5
+# stress     positive  78.5
+
+binom.test(x = 119, n = (119 + 34), p = 0.5)
+# p-value = 2.963e-12
+binom.test(x = 84, n = (84 + 78), p = 0.5)
+# p-value = 0.6946
+
+
+# Mean number of specific/nonspecific genes per protein
 gn %>%
         group_by(protein, specificity) %>%
         summarize(n = n()) %>% #print()
         group_by(specificity) %>%        
         summarize(mean = mean(n))
-# specific    53.5
-# unspecific  103.
+# nonspecific  103.
+# specific      53.5
 
 
 # Mean number of essential/non-essential genes per protein
@@ -163,6 +242,13 @@ gn %>%
 # essential  mean
 # FALSE      59.6
 # TRUE       96.5
+
+binom.test(x = 97, n = 156, p = sum(combdf.gn$essential)/nrow(combdf.gn))
+# p-value < 2.2e-16 
+
+table(combdf.gn$essential, ifelse(combdf.gn$FDR0.05_count > 0, "sig", "nonsig"))
+chisq.test(combdf.gn$essential, ifelse(combdf.gn$FDR0.05_count > 0, "sig", "nonsig"))
+# p-value < 2.2e-16
 
 
 # Mean number of essential/non-essential genes per protein, by sign
@@ -177,7 +263,10 @@ gn %>%
 # positive FALSE      30.3
 # positive TRUE       19.7
 
-
+76.8/(76.8+29.4) # 72% of negative regulators are essential
+19.7/(19.7+30.3) # 39% of positive regulators are essential
+76.8/(76.8+19.7) # 80% of essential regulators have negative effect
+29.4/(29.4+30.3) # 49% of nonessential regulators have negative effect
 
 
 
@@ -249,7 +338,6 @@ ggsave(paste0(resdir, "Nsig_gn_fill.pdf"), width = 5, height = 4)
 # Plot counts of significant guides/genes by specificity -----------------------
 
 (pgd2 <- gd %>%
-        mutate(specificity = forcats::fct_rev(as.factor(specificity))) %>%
         mutate(type = case_when(protein %in% c("Eno2", "Fas1", "Fas2",
                                                "Htb2", "Rnr2", "Rpl9A", "Tdh3") ~ "Core functions",
                                 protein %in% c("Tdh1", "Tdh2", "Ssa1", "Yhb1") ~ "Stress regulated",
@@ -259,11 +347,12 @@ ggsave(paste0(resdir, "Nsig_gn_fill.pdf"), width = 5, height = 4)
                                                     "Tdh1", "Tdh2", "Ssa1", "Yhb1"))) %>%
         group_by(type, protein, sign, specificity) %>%
         summarize(n = n()) %>%
-         mutate(n = ifelse(sign == "negative", -1*n, n)) %>%
-         mutate(specificity = case_when(specificity == "unspecific" ~ "Unspecific",
-                                        specificity == "specific" ~ "Specific",
-                                 TRUE ~ NA_character_)) %>%
-         ggplot(aes(x = protein, y = n, fill = specificity)) +
+        mutate(n = ifelse(sign == "negative", -1*n, n)) %>%
+        mutate(specificity = case_when(specificity == "nonspecific" ~ "Nonspecific",
+                                       specificity == "specific" ~ "Specific",
+                                       TRUE ~ NA_character_)) %>%
+        mutate(specificity = forcats::fct_rev(as.factor(specificity))) %>%
+        ggplot(aes(x = protein, y = n, fill = specificity)) +
         #geom_bar(stat = "identity", position = "dodge") +
         geom_bar(stat = "identity") +
         geom_hline(yintercept = 0, color = "white") +
@@ -282,7 +371,6 @@ ggsave(paste0(resdir, "Nsig_spec_gd_fill.pdf"), width = 5, height = 4)
 
 
 (pgn2 <- gn %>%
-        mutate(specificity = forcats::fct_rev(as.factor(specificity))) %>%
         mutate(type = case_when(protein %in% c("Eno2", "Fas1", "Fas2", 
                                                "Htb2", "Rnr2", "Rpl9A", "Tdh3") ~ "Core functions",
                                 protein %in% c("Tdh1", "Tdh2", "Ssa1", "Yhb1") ~ "Stress regulated",
@@ -293,9 +381,10 @@ ggsave(paste0(resdir, "Nsig_spec_gd_fill.pdf"), width = 5, height = 4)
         group_by(type, protein, sign, specificity) %>%
         summarize(n = n()) %>%
         mutate(n = ifelse(sign == "negative", -1*n, n)) %>%
-        mutate(specificity = case_when(specificity == "unspecific" ~ "Unspecific",
+        mutate(specificity = case_when(specificity == "nonspecific" ~ "Nonspecific",
                                        specificity == "specific" ~ "Specific",
                                        TRUE ~ NA_character_)) %>%
+        mutate(specificity = forcats::fct_rev(as.factor(specificity))) %>%
         ggplot(aes(x = protein, y = n, fill = specificity)) +
         #geom_bar(stat = "identity", position = "dodge") +
         geom_bar(stat = "identity") +
@@ -386,7 +475,10 @@ ggsave(paste0(resdir, "Nsig_ess_gn_fill.pdf"), width = 5, height = 4)
 # Plot counts of significant guides by set -------------------------------------
 
 (pgd4 <- gd %>%
-        mutate(set = forcats::fct_rev(as.factor(set))) %>%
+        mutate(set = case_when(set == "eProvs"  ~ "Conserved residue,\nessential gene",
+                               set == "neProvs" ~ "Conserved residue,\nnonessential gene",
+                               set == "neStops" ~ "Premature stop,\nnonessential gene",
+                               TRUE ~ NA_character_)) %>%
         mutate(type = case_when(protein %in% c("Eno2", "Fas1", "Fas2", 
                                                "Htb2", "Rnr2", "Rpl9A", "Tdh3") ~ "Core functions",
                                 protein %in% c("Tdh1", "Tdh2", "Ssa1", "Yhb1") ~ "Stress regulated",
@@ -396,6 +488,8 @@ ggsave(paste0(resdir, "Nsig_ess_gn_fill.pdf"), width = 5, height = 4)
                                                     "Tdh1", "Tdh2", "Ssa1", "Yhb1"))) %>%
         group_by(type, protein, set, sign) %>%
         summarize(n = n()) %>%
+        mutate(set = as.factor(set),
+              set = forcats::fct_rev(set)) %>%
         mutate(n = ifelse(sign == "negative", -1*n, n)) %>% print() %>%
         ggplot(aes(x = protein, y = n, fill = set)) +
         #geom_bar(stat = "identity", position = "dodge") +
@@ -409,11 +503,12 @@ ggsave(paste0(resdir, "Nsig_ess_gn_fill.pdf"), width = 5, height = 4)
               panel.grid.minor = element_blank(),
               #legend.position = "none",
               legend.title = element_blank(),
+              legend.text = element_text(margin = margin(t = 3, b = 3, unit = "pt")),
               axis.text.x = element_text(angle = 30, vjust = 0.6), 
               axis.title.x = element_blank()) +
         facet_grid(~ type, space = "free", scales = "free_x"))
-#ggsave(paste0(resdir, "Nsig_set_gd_dodge.pdf"), width = 6, height = 4)
-ggsave(paste0(resdir, "Nsig_set_gd_fill.pdf"), width = 5, height = 4)
+#ggsave(paste0(resdir, "Nsig_set_gd_dodge.pdf"), width = 6.5, height = 4)
+ggsave(paste0(resdir, "Nsig_set_gd_fill.pdf"), width = 5.5, height = 4)
 
 
 
@@ -421,7 +516,7 @@ ggsave(paste0(resdir, "Nsig_set_gd_fill.pdf"), width = 5, height = 4)
 # All counts plots combined ----------------------------------------------------
 
 all <- egg::ggarrange(pgn1, pgn2, pgn3, pgd4, ncol = 1)
-ggsave(plot = all, paste0(resdir, "Nsig_all.pdf"), width = 5, height = 12)
+ggsave(plot = all, paste0(resdir, "Nsig_all.pdf"), width = 5.5, height = 12)
 
 
 
@@ -429,6 +524,10 @@ ggsave(plot = all, paste0(resdir, "Nsig_all.pdf"), width = 5, height = 12)
 # Plot log2fc of significant guides by set -------------------------------------
 
 (pgd5 <- gd %>%
+         mutate(set = case_when(set == "eProvs"  ~ "Conserved residue,\nessential gene",
+                                set == "neProvs" ~ "Conserved residue,\nnonessential gene",
+                                set == "neStops" ~ "Premature stop,\nnonessential gene",
+                                TRUE ~ NA_character_)) %>%
          mutate(set = forcats::fct_rev(as.factor(set))) %>%
          mutate(type = case_when(protein %in% c("Eno2", "Fas1", "Fas2", 
                                                 "Htb2", "Rnr2", "Rpl9A", "Tdh3") ~ "Core functions",
@@ -448,20 +547,7 @@ ggsave(plot = all, paste0(resdir, "Nsig_all.pdf"), width = 5, height = 12)
                legend.title = element_blank(),
                axis.text.x = element_text(angle = 30, vjust = 0.6), 
                axis.title.x = element_blank()))
-ggsave(paste0(resdir, "Eff_set_gd.pdf"), width = 3, height = 3)
-
-# Mean log2fc by set
-gd %>%
-        group_by(set, sign) %>%
-        summarize(mean = mean(log2fc),
-                  median = median(log2fc))
-# set     sign      mean median
-# eProvs  negative -1.18 -1.13 
-# eProvs  positive  1.15  0.969
-# neProvs negative -1.06 -0.927
-# neProvs positive  1.09  0.970
-# neStops negative -1.16 -1.12 
-# neStops positive  1.19  1.12 
+ggsave(paste0(resdir, "Eff_set_gd.pdf"), width = 3, height = 3.5)
 
 
 
