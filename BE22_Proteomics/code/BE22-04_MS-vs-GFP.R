@@ -21,6 +21,11 @@ resdir <- "results/MS-vs-GFP/"
 dir.create(resdir)
 
 
+# Import annotations
+muts  <- read_delim("annotations/MutationLookup.tsv", delim = "\t") %>% as_tibble %>% print()
+prots <- read_delim("annotations/ProteinLookup.tsv", delim = "\t") %>% pull(gene) %>% toupper() %>% print()
+
+
 # Import results from base editor screens (guide-level, not gene-level)
 gfp <- readRDS("../BE19_GFPScreens/results/processing/combdf_gd.RDS") %>% 
         select(guide, gene, Eno2_log2fc:Yhb1_q) %>%
@@ -43,11 +48,6 @@ ms <- read_delim("results/artMS/artMS_results_OS.tsv", delim = "\t") %>%
                MS_log2fci = log2FC.i,
                MS_qi      = adj.p.i) %>% 
         select(-geneSys) %>% print()
-
-
-# Import annotations
-muts  <- read_delim("annotations/MutationLookup.tsv", delim = "\t") %>% as_tibble %>% print()
-prots <- read_delim("annotations/ProteinLookup.tsv", delim = "\t") %>% pull(gene) %>% toupper() %>% print()
 
 
 # Import gene annotations
@@ -73,7 +73,7 @@ comb <- muts %>%
 
 
 
-# Scatter plots ----------------------------------------------------------------
+# Scatter plot -----------------------------------------------------------------
 
 # All proteins in POP1
 comb %>%
@@ -97,7 +97,7 @@ ggsave(paste0(resdir, "GFP-vs-MS_scatter_POP1.pdf"), width = 3, height = 3)
 
 
 
-# Heatmap ----------------------------------------------------------------------
+# Heatmaps ---------------------------------------------------------------------
 
 # For Tdh123 in IRA2* and RAS2*
 comb %>%
@@ -128,23 +128,23 @@ comb %>%
 ggsave(paste0(resdir, "GFP-vs-MS_heatmap_Tdh12.pdf"), width = 3, height = 1.55)
 
 
-# For Tdh2/Yhb1 in IRA2*, RAS2* and RAS2**
+# For Tdh123 in IRA2*, RAS2-S46L and RAS2* (GFP only)
 comb %>%
         pivot_longer(-c(guide, geneSys, gene, mutation, alt, protein),
                      names_to = c("type", ".value"),
                      names_pattern = "(.+)_(.+)") %>%
         mutate(alt = factor(alt, levels = c("IRA2", "RAS21", "RAS22"))) %>%
-        filter(!is.na(type)) %>%
+        filter(type == "GFP") %>% 
         filter(!is.na(alt)) %>%
         filter(alt %in% c("IRA2", "RAS21", "RAS22")) %>%
-        filter(protein %in% c("Tdh2", "Yhb1")) %>% 
+        filter(protein %in% c("Tdh1", "Tdh2", "Tdh3")) %>% 
         mutate(alt = recode(alt, 
                             "IRA2"  = "IRA2 W342*",
                             "RAS22" = "RAS2 Q272*",
                             "RAS21" = "RAS2 S46L")) %>%
         mutate(log2fc = case_when(log2fc >  1 ~  1,
-                                 log2fc < -1 ~ -1,
-                                 TRUE ~ log2fc)) %>%
+                                  log2fc < -1 ~ -1,
+                                  TRUE ~ log2fc)) %>% #print()
         ggplot() +
         geom_tile(aes(x = protein, y = alt, fill = log2fc)) +
         scale_fill_distiller(palette = "RdBu", name = "Log2FC", limit = c(-1, 1)) +
@@ -154,9 +154,8 @@ comb %>%
               panel.grid.minor = element_blank(),
               axis.title.x = element_blank(),
               axis.title.y = element_blank(),
-              axis.text.x  = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-        facet_grid(~ type)
-ggsave(paste0(resdir, "GFP-vs-MS_heatmap_discordant.pdf"), width = 3, height = 1.7)
+              axis.text.x  = element_text(angle = 90, vjust = 0.5, hjust = 1))
+ggsave(paste0(resdir, "GFP_heatmap_discordant.pdf"), width = 3, height = 1.8)
 
 
 
