@@ -112,18 +112,22 @@ res4.add <- res4 %>%
         print()
 
 table(res4.add$consequence_stop, res4.add$enriched)
-chisq.test(res4.add$consequence_stop, res4.add$enriched)
-#X-squared = 8.0357, df = 1, p-value = 0.004586
+#       FALSE TRUE
+# FALSE    73   11
+# TRUE      2    4
 
 fisher.test(res4.add$consequence_stop, res4.add$enriched)
 # p-value = 0.006454
+# odds ratio = 12.6
 
 table(res4.add$consequence_syn, res4.add$enriched)
-chisq.test(res4.add$consequence_syn, res4.add$enriched)
-# X-squared = 3.4159, df = 1, p-value = 0.06457
+#       FALSE TRUE
+# FALSE    56   15
+# TRUE     19    0
 
 fisher.test(res4.add$consequence_syn, res4.add$enriched)
 # p-value = 0.03419
+# odds ratio = 0
 
 
 # Stats by read count
@@ -161,11 +165,9 @@ table(res4.ns$provean5, res4.ns$enriched)
 # hiProv    11    7
 # loProv    43    4
 
-chisq.test(res4.ns$provean5, res4.ns$enriched)
-# X-squared = 6.5191, df = 1, p-value = 0.01067
-
 fisher.test(res4.ns$provean5, res4.ns$enriched)
 # p-value = 0.007196
+# odds ratio = 0.1518771 
 
 
 
