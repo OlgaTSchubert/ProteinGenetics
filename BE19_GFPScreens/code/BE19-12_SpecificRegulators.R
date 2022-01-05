@@ -71,8 +71,8 @@ ggsave(paste0(resdir, "VolcanoPlots.pdf"), width = 10, height = 5)
 
 gn %>%
         inner_join(mediator, by = c("gene", "geneSys")) %>%
-        mutate(gene    = factor(geneComb2, levels = rev(pull(mediator, geneComb2))),
-               set     = factor(set,  levels = c("Cdk8", "Middle", "Head", "Tail")),
+        mutate(gene    = factor(gene2, levels = rev(pull(mediator, gene2))),
+               set     = factor(set, levels = c("Cdk8", "Middle", "Head", "Tail")),
                protein = factor(protein, levels = c("Htb2", "Tdh1", "Tdh2", "Tdh3", 
                                                     "Eno2", "Fas1", "Fas2", "Rnr2", 
                                                     "Rpl9A", "Ssa1", "Yhb1"))) %>%
