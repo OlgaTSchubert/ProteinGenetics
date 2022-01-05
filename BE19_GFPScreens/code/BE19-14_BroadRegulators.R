@@ -64,7 +64,6 @@ ggsave(paste0(resdir, "Piechart.pdf"), width = 2, height = 2)
 
 gn %>%
         filter(FDR0.05_count > 7) %>%
-        #filter(FDR0.05_count > 7 | gene == "SAP155") %>%
         #filter(gene %in% c("POP1", "SIT4", "SAP155")) %>%
         #mutate(gene = factor(gene, levels = c("POP1", "SIT4", "SAP155"))) %>%
         mutate(log2fc = case_when(log2fc >  1.5 ~  1.5,
@@ -81,7 +80,6 @@ gn %>%
               panel.grid.major = element_blank(), 
               panel.grid.minor = element_blank())
 ggsave(paste0(resdir, "Heatmap_29.pdf"), width = 3.3, height = 5)
-ggsave(paste0(resdir, "Heatmap_29_SAP155.pdf"), width = 3.3, height = 5)
 ggsave(paste0(resdir, "Heatmap_POP1_SIT4_SAP155.pdf"), width = 3.3, height = 2)
 
 
@@ -93,6 +91,10 @@ ggsave(paste0(resdir, "Heatmap_POP1_SIT4_SAP155.pdf"), width = 3.3, height = 2)
 combdf.gd %>%
         mutate(FDR0.05_count = str_c("n", FDR0.05_count)) %>%
         mutate(FDR0.05_count = ifelse(FDR0.05_count %in% c("n8", "n9", "n10"), "n8+", FDR0.05_count)) %>%
+        mutate(set = case_when(set == "eProvs"  ~ "Conserved residue,\nessential gene",
+                               set == "neProvs" ~ "Conserved residue,\nnonessential gene",
+                               set == "neStops" ~ "Premature stop,\nnonessential gene",
+                               TRUE ~ NA_character_)) %>%
         mutate(set = forcats::fct_rev(as.factor(set))) %>%
         ggplot(aes(x = FDR0.05_count, fill = set)) +
         geom_bar(position = "fill") +
@@ -100,6 +102,7 @@ combdf.gd %>%
         labs(x = "Number of proteins affected", y = "Fraction of gRNAs") +
         theme_bw() +
         theme(legend.title = element_blank(),
+              legend.text = element_text(margin = margin(t = 3, b = 3, unit = "pt")),
               panel.grid.major = element_blank(), 
               panel.grid.minor = element_blank())
 ggsave(paste0(resdir, "Fraction_set_spec_gd.pdf"), height = 3, width = 4)
