@@ -141,7 +141,7 @@ eHSGenes <- as_tibble(str_split(elife2018$allGenesInInterval, pattern = ";", sim
         dplyr::filter(eHS.gene != "") %>% print()
 
 
-# Combine our data with Alber et al., 2018
+# Combine our data with Albert et al., 2018
 comb <- combdf.gnx %>%
         full_join(eHSGenes, by = c("Name" = "eHS.gene")) %>%
         dplyr::filter(!is.na(eHS.ID)) %>%
