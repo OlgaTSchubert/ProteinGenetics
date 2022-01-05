@@ -129,7 +129,7 @@ gd.sum <- combdf.gd %>%
 # TRUE     582     157     281
 
 chisq.test(gd.sum[, c("neProvs", "neStops")])
-# p-value = 1.208e-09
+# X-squared = 36.957, df = 1, p-value = 1.208e-09
 
 
 # Mean log2fc by set and sign
@@ -157,7 +157,7 @@ gd %>%
 # neStops  1.18  1.12 
 
 
-# T-test for abs(log2fc) by set
+# t-test for abs(log2fc) by set
 neProvs.abs <- gd %>%
         filter(set == "neProvs") %>%
         pull(log2fc) %>% abs() %>% print()
@@ -243,12 +243,16 @@ gn %>%
 # FALSE      59.6
 # TRUE       96.5
 
-binom.test(x = 97, n = 156, p = sum(combdf.gn$essential)/nrow(combdf.gn))
+binom.test(x = 97, n = (60 + 97), p = sum(combdf.gn$essential)/nrow(combdf.gn))
 # p-value < 2.2e-16 
 
 table(combdf.gn$essential, ifelse(combdf.gn$FDR0.05_count > 0, "sig", "nonsig"))
+#       nonsig  sig
+# FALSE   3202  366
+# TRUE     600  344
+
 chisq.test(combdf.gn$essential, ifelse(combdf.gn$FDR0.05_count > 0, "sig", "nonsig"))
-# p-value < 2.2e-16
+# X-squared = 383.98, df = 1, p-value < 2.2e-16
 
 
 # Mean number of essential/non-essential genes per protein, by sign
