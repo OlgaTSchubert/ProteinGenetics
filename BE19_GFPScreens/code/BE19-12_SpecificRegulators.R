@@ -50,7 +50,7 @@ gn %>%
         geom_point(data = . %>% filter(is.na(set)), color = "gray80") +
         geom_point(data = . %>% filter(q < 0.05 & FDR0.05_count > 7), color = "gray40") +
         geom_point(data = . %>% filter(!is.na(set))) +
-        ylab("-Log10(q)") +
+        ylab("-Log10(adj.p)") +
         xlab("Log2FC") +
         theme_bw() +
         theme(panel.grid.minor = element_blank(),
