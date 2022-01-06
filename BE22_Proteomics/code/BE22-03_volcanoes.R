@@ -13,7 +13,7 @@ getwd()
 
 
 # Results directory
-resdir <- "results/volcano/"
+resdir <- "results/volcanoes/"
 dir.create(resdir)
 
 

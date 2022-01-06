@@ -174,16 +174,16 @@ artmsAnalysisQuantifications(
 res <- read_delim(paste0(resdir, "results_adjpvalue/artMS_results-log2fc-long.txt"), delim = "\t") %>% 
         as_tibble() %>%
         rename(geneSys  = "Protein") %>%
-        left_join(sgd, by = "geneSys") %>%
+        left_join(sgd, by = "geneSys") %>% 
         mutate(mutant = str_sub(Comparison, 1, -4)) %>% 
         mutate(adj.pvalue = ifelse(is.na(pvalue), NA, adj.pvalue)) %>%
-        select(geneSys, gene, mutant, log2FC, adj.pvalue, 
-               iLog2FC, iPvalue) %>%
         rename(log2FC   = "log2FC",
                log2FC.i = "iLog2FC",
                adj.p    = "adj.pvalue",
                adj.p.i  = "iPvalue") %>%
+        select(geneSys, gene, mutant, log2FC, adj.p, log2FC.i, adj.p.i) %>%
         mutate_at(vars(log2FC, log2FC.i, adj.p, adj.p.i), list(as.numeric)) %>%
+        filter(mutant != "SAP155") %>%
         print()
 write_delim(res, paste0(resdir, "artMS_results_OS.tsv"), delim = "\t")
 
@@ -201,5 +201,5 @@ write_delim(res.wide, paste0(resdir, "artMS_results_OS_wide.tsv"), delim = "\t")
 
 # Session info -----------------------------------------------------------------
 
-writeLines(capture.output(sessionInfo()), "code/BE22-01_SessionInfo.txt")
+writeLines(capture.output(sessionInfo()), "code/BE22-01_SessionInfo_NEW.txt")
 
