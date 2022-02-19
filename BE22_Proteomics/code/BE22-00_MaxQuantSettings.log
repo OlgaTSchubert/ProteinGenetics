@@ -1,0 +1,178 @@
+_________________________
+-------------------------
+MaxQuant v5
+_________________________
+-------------------------
+
+-------------------------
+Software
+-------------------------
+
+- MaxQuant v 1.6.17.0 run
+- Microsoft Windows 10 Home (on iMac) with 32 GB memory, 4 cores, 4 logical processors
+
+
+
+-------------------------
+Run
+-------------------------
+
+Before starting MaxQuant
+- Rename all raw files to short form (IRA2_A, IRA2_B, etc.).
+- Create output folder "MaxQuant_v5" and select it under Global parameters > Folder locations > Select
+- Go through all parameters and set as defined below
+- Select 3 processors in lower left corner (next to Start button)
+- Start and follow progress in the Performance tab
+
+After MaxQuant has run
+- The mqpar.xml file with all parameters is saved in the raw data folder and should be moved to the "MaxQuant_v5" folder.
+
+
+
+-------------------------
+Raw data
+-------------------------
+
+- Load: select all 27 raw files (incl. RPA49 which isn't in paper)
+- Set experiment: set experiment names row by row (IRA2_A, IRA2_B, etc.)
+- No other changes here
+
+
+
+-------------------------
+Group-specific parameters
+-------------------------
+
+Type
+- Standard
+- Multiplicity: 1
+- Labels: none
+
+Modifications
+- Variable: Oxidation (M), Acetyl (Protein N-term)
+- Fixed: Carbamidomethyl (C)
+- Max number of modifications per peptide: 3
+
+Instrument
+- Orbitrap (keep all default settings)
+
+First search
+- Separate variable modifications: no
+- Separate enzyme for first search: no
+
+Digestion
+- Digestion mode: Specific (i.e. fully tryptic)
+- Enzyme: LysC/P (cleaves even if followed by P), Trypsin
+- Max missed: 1
+
+Label-free quantification
+- LFQ
+- LFQ min ratio count: 1
+- Normalization type: Classic
+- Fast LFQ: yes
+- LFQ min neighbors: 3
+- LFQ average neighbors: 6
+
+Misc.
+- Requantify: no
+- Isobaric weight exponent: 0.75
+
+
+
+-------------------------
+Global parameters
+-------------------------
+
+Sequences
+- Fasta files: orf_trans_R64-2-1_20150113_mod.fasta
+- Identifier rule: >([^\s]*)
+- Descriptor rule: >(.*)
+- Include contaminants: yes
+- Min. peptide length: 7
+- Max peptide mass [Da]: 4600
+- Min peptide length for unspecific search: 8
+- Max peptide length for unspecific search: 25
+- Variation mode: None
+- Proteogenomics fasta files: none
+
+Protein quantification
+- Label min ratio count: 1
+- Peptides for quantification: unique
+- Use only unmodified peptides and...: yes
+- Modifications used in protein quantification: Carbamidomethyl (C)
+- Discard unmodified counterpart peptides: no
+- Advanced ratio estimation: yes
+
+Tables
+- Write msScans table: no
+- Write msmsScans table: yes
+- Write ms3Scans table: no
+- Write allPeptides table: yes
+- Write mzRange table: yes
+- Write mzTab table: yes
+- Write DIA fragments table: no
+- Write pasefMsmsScans table: yes
+
+MS/MS Analyzer
+- Keep defaults
+
+Advanced
+- Calculate peak properties: no
+- Decoy mode: Revert
+- Use for occupancies: Normalized ratios
+- Epsilon score for mutations: yes
+- Evaluate variant peptides separately: yes
+- Separate fasta file for first search: none
+- Disable MD5: no
+- Max mods in site table: 3
+- Andromeda cache size: 350000
+- Use series reporters: no
+- MS2 precursor mass shift: 0
+- Complementary ion ppm: 20
+- Use .NET Core: no
+
+Identification
+- PSM FDR: 0.01
+- Protein FDR: 0.01
+- Site decoy fraction: 0.01
+- Min peptides: 1
+- Min razor + unique peptides: 1
+- Min unique peptides: 1
+- Min score for unmodified peptides: 0
+- Min score for modified peptides: 40
+- Min delta score for unmodified peptides: 0
+- Min delta score for modified peptides: 6
+- Min search max. combinations: 200
+- Base FDR calculations on delta score: no
+- Razor protein FDR: yes
+- Split protein groups by taxonomy ID: no
+- Second peptides: yes
+- Match between runs: yes
+- Match time window [min]: 10
+- Match ion mobility window: 0.05
+- Alignment time window [min]: 20
+- Alignment ion mobility: 1
+- Match unidentified features: yes
+- Dependent peptides: no
+
+Label-free quantification
+- Separate LFQ in parameter groups: no
+- Stabilize large LFQ ratios: yes
+- Top N peptides: 0
+- Require MS/MS for LFQ comparisons: yes
+- iBAQ: yes
+- Log fit: yes
+- Advanced site intensities: yes
+
+Folder locations
+- C:\Users\Olga\Desktop\BE22_Proteomics\MaxQuant_v5
+- Fixed andromeda index folder: none
+
+MS/MS fragmentation
+- (empty)
+
+Configuration
+- Modifications: keep all default settings
+- Proteases: keep all default settings
+
+
