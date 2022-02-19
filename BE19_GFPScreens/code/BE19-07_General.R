@@ -199,8 +199,11 @@ gn %>%
 # negative    106.
 # positive     50 
 
-binom.test(x = 106, n = 156, p = 0.5) 
-# p-value = 8.633e-06
+binom.test(x = 106, n = (106 + 50), p = 0.5) 
+# number of successes = 106, number of trials = 156, p-value = 8.633e-06
+# alternative hypothesis: true probability of success is not equal to 0.5
+# 95 percent confidence interval: 0.6001447 0.7518587
+# sample estimates: probability of success: # 0.6794872 
 
 
 # Mean number of positive/negative genes per protein, by protein fct
@@ -218,9 +221,16 @@ gn %>%
 # stress     positive  78.5
 
 binom.test(x = 119, n = (119 + 34), p = 0.5)
-# p-value = 2.963e-12
-binom.test(x = 84, n = (84 + 78), p = 0.5)
-# p-value = 0.6946
+# number of successes = 119, number of trials = 153, p-value = 2.963e-12
+# alternative hypothesis: true probability of success is not equal to 0.5
+# 95 percent confidence interval: 0.7035548 0.8409278
+# sample estimates: probability of success: 0.7777778 
+
+binom.test(x = 84, n = (84 + 79), p = 0.5)
+# number of successes = 84, number of trials = 163, p-value = 0.7542
+# alternative hypothesis: true probability of success is not equal to 0.5
+# 95 percent confidence interval: 0.4358847 0.5942224
+# sample estimates: probability of success: 0.5153374 
 
 
 # Mean number of specific/nonspecific genes per protein
