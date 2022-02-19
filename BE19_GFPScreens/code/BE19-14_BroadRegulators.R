@@ -1,6 +1,7 @@
 # Libraries --------------------------------------------------------------------
 
 library(tidyverse)
+library(patchwork)
 
 
 
@@ -60,17 +61,16 @@ ggsave(paste0(resdir, "Piechart.pdf"), width = 2, height = 2)
 
 
 
-# Heatmap ----------------------------------------------------------------------
+# Heatmaps ----------------------------------------------------------------------
 
-gn %>%
+(p1 <- gn %>%
         filter(FDR0.05_count > 7) %>%
-        #filter(gene %in% c("POP1", "SIT4", "SAP155")) %>%
-        #mutate(gene = factor(gene, levels = c("POP1", "SIT4", "SAP155"))) %>%
         mutate(log2fc = case_when(log2fc >  1.5 ~  1.5,
                                   log2fc < -1.5 ~ -1.5,
                                   TRUE ~ log2fc)) %>%
         ggplot() +
         geom_tile(aes(x = protein, y = gene, fill = log2fc)) +
+        coord_equal() +
         scale_fill_distiller(palette = "RdBu", name = "Log2FC", limit = c(-1.5, 1.5)) +
         scale_y_discrete(limits = rev) +
         theme_bw() +
@@ -78,9 +78,57 @@ gn %>%
               axis.title.y = element_blank(),
               axis.text.x  = element_text(angle = 90, vjust = 0.5, hjust = 1),
               panel.grid.major = element_blank(), 
-              panel.grid.minor = element_blank())
+              panel.grid.minor = element_blank()))
 ggsave(paste0(resdir, "Heatmap_29.pdf"), width = 3.3, height = 5)
-ggsave(paste0(resdir, "Heatmap_POP1_SIT4_SAP155.pdf"), width = 3.3, height = 2)
+
+(p2 <- gn %>%
+        filter(gene %in% c("SIT4", "SAP155")) %>%
+        mutate(gene = factor(gene, levels = c("SIT4", "SAP155"))) %>%
+        mutate(log2fc = case_when(log2fc >  1.5 ~  1.5,
+                                  log2fc < -1.5 ~ -1.5,
+                                  TRUE ~ log2fc)) %>%
+        ggplot() +
+        geom_tile(aes(x = protein, y = gene, fill = log2fc)) +
+        coord_equal() +
+        scale_fill_distiller(palette = "RdBu", name = "Log2FC", limit = c(-1.5, 1.5)) +
+        scale_y_discrete(limits = rev) +
+        theme_bw() +
+        theme(legend.position = "none",
+              axis.title.x = element_blank(),
+              axis.title.y = element_blank(),
+              axis.text.x  = element_text(angle = 90, vjust = 0.5, hjust = 1),
+              panel.grid.major = element_blank(), 
+              panel.grid.minor = element_blank()))
+
+
+# Combined plot
+p1 / p2   # library(patchwork)
+ggsave(paste0(resdir, "Heatmap_combined.pdf"), width = 3.3, height = 5.5)
+
+
+
+
+# Scatter for SIT4 and SAP155 --------------------------------------------------
+
+gn %>%
+        filter(gene %in% c("SIT4", "SAP155")) %>%
+        select(-geneSys, -FDR0.05_count) %>%
+        pivot_wider(names_from = gene, values_from = c(log2fc, q)) %>%
+        ggplot(aes(x = log2fc_SIT4, y = log2fc_SAP155)) +
+        geom_hline(aes(yintercept = 0), color = "grey") +
+        geom_vline(aes(xintercept = 0), color = "grey") +
+        geom_smooth(method = "lm", formula = y ~ 0 + x) +
+        ggpubr::stat_cor(label.x.npc = "center", label.y.npc = "top") +
+        geom_point() +
+        ggrepel::geom_text_repel(aes(label = protein),
+                                 size = 4, box.padding = 0.3, point.padding = 0.1) +
+        scale_x_continuous(limits = c(-0.5, 2.5), name = "Log2FC, SIT4 perturbation") +
+        scale_y_continuous(limits = c(-0.5, 2.5), name = "Log2FC, SAP155 perturbation") +
+        theme_bw() +
+        theme(legend.position = "none",
+              panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank())
+ggsave(paste0(resdir, "Scatter_SIT4-vs-SAP155.pdf"), width = 3, height = 3)
 
 
 
