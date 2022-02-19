@@ -108,31 +108,6 @@ ggsave(paste0(resdir, "Heatmap_combined.pdf"), width = 3.3, height = 5.5)
 
 
 
-# Scatter for SIT4 and SAP155 --------------------------------------------------
-
-gn %>%
-        filter(gene %in% c("SIT4", "SAP155")) %>%
-        select(-geneSys, -FDR0.05_count) %>%
-        pivot_wider(names_from = gene, values_from = c(log2fc, q)) %>%
-        ggplot(aes(x = log2fc_SIT4, y = log2fc_SAP155)) +
-        geom_hline(aes(yintercept = 0), color = "grey") +
-        geom_vline(aes(xintercept = 0), color = "grey") +
-        geom_smooth(method = "lm", formula = y ~ 0 + x) +
-        ggpubr::stat_cor(label.x.npc = "center", label.y.npc = "top") +
-        geom_point() +
-        ggrepel::geom_text_repel(aes(label = protein),
-                                 size = 4, box.padding = 0.3, point.padding = 0.1) +
-        scale_x_continuous(limits = c(-0.5, 2.5), name = "Log2FC, SIT4 perturbation") +
-        scale_y_continuous(limits = c(-0.5, 2.5), name = "Log2FC, SAP155 perturbation") +
-        theme_bw() +
-        theme(legend.position = "none",
-              panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank())
-ggsave(paste0(resdir, "Scatter_SIT4-vs-SAP155.pdf"), width = 3, height = 3)
-
-
-
-
 # Fraction of ess/set as function of specificity -------------------------------
 
 # By set
