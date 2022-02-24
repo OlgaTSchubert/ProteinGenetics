@@ -167,7 +167,7 @@ neStops.abs <- gd %>%
         pull(log2fc) %>% abs() %>% print()
 
 t.test(neProvs.abs, neStops.abs, alternative = "two.sided")
-# p-value = 0.002807
+# t = -3.0032, df = 495.68, p-value = 0.002807
 
 
 
@@ -314,7 +314,7 @@ gn %>%
               axis.text.x = element_text(angle = 30, vjust = 0.6), 
               axis.title.x = element_blank()) +
         facet_grid(~ type, space = "free", scales = "free_x"))
-ggsave(paste0(resdir, "Nsig_gd_fill.pdf"), width = 5, height = 4)
+ggsave(paste0(resdir, "Nsig_gd.pdf"), width = 5, height = 4)
 
 
 (pgn1 <- gn %>%
@@ -344,7 +344,7 @@ ggsave(paste0(resdir, "Nsig_gd_fill.pdf"), width = 5, height = 4)
               axis.text.x = element_text(angle = 30, vjust = 0.6), 
               axis.title.x = element_blank()) +
         facet_grid(~ type, space = "free", scales = "free_x"))
-ggsave(paste0(resdir, "Nsig_gn_fill.pdf"), width = 5, height = 4)
+ggsave(paste0(resdir, "Nsig_gn.pdf"), width = 5, height = 4)
 
 
 
@@ -367,7 +367,6 @@ ggsave(paste0(resdir, "Nsig_gn_fill.pdf"), width = 5, height = 4)
                                        TRUE ~ NA_character_)) %>%
         mutate(specificity = forcats::fct_rev(as.factor(specificity))) %>%
         ggplot(aes(x = protein, y = n, fill = specificity)) +
-        #geom_bar(stat = "identity", position = "dodge") +
         geom_bar(stat = "identity") +
         geom_hline(yintercept = 0, color = "white") +
         ylab("Number of guides") +
@@ -380,8 +379,7 @@ ggsave(paste0(resdir, "Nsig_gn_fill.pdf"), width = 5, height = 4)
               axis.text.x = element_text(angle = 30, vjust = 0.6), 
               axis.title.x = element_blank()) +
         facet_grid(~ type, space = "free", scales = "free_x"))
-#ggsave(paste0(resdir, "Nsig_spec_gd_dodge.pdf"), width = 6, height = 4)
-ggsave(paste0(resdir, "Nsig_spec_gd_fill.pdf"), width = 5, height = 4)
+ggsave(paste0(resdir, "Nsig_spec_gd.pdf"), width = 5, height = 4)
 
 
 (pgn2 <- gn %>%
@@ -400,7 +398,6 @@ ggsave(paste0(resdir, "Nsig_spec_gd_fill.pdf"), width = 5, height = 4)
                                        TRUE ~ NA_character_)) %>%
         mutate(specificity = forcats::fct_rev(as.factor(specificity))) %>%
         ggplot(aes(x = protein, y = n, fill = specificity)) +
-        #geom_bar(stat = "identity", position = "dodge") +
         geom_bar(stat = "identity") +
         geom_hline(yintercept = 0, color = "white") +
         ylab("Number of genes") +
@@ -413,8 +410,7 @@ ggsave(paste0(resdir, "Nsig_spec_gd_fill.pdf"), width = 5, height = 4)
               axis.text.x = element_text(angle = 30, vjust = 0.6), 
               axis.title.x = element_blank()) +
         facet_grid(~ type, space = "free", scales = "free_x"))
-#ggsave(paste0(resdir, "Nsig_spec_gn_dodge.pdf"), width = 6, height = 4)
-ggsave(paste0(resdir, "Nsig_spec_gn_fill.pdf"), width = 5, height = 4)
+ggsave(paste0(resdir, "Nsig_spec_gn.pdf"), width = 5, height = 4)
 
 
 
@@ -436,7 +432,6 @@ ggsave(paste0(resdir, "Nsig_spec_gn_fill.pdf"), width = 5, height = 4)
          summarize(n = n()) %>%
          mutate(n = ifelse(sign == "negative", -1*n, n)) %>%
          ggplot(aes(x = protein, y = n, fill = essential)) +
-         #geom_bar(stat = "identity", position = "dodge") +
          geom_bar(stat = "identity") +
          geom_hline(yintercept = 0, color = "white") +
          ylab("Number of guides") +
@@ -449,8 +444,7 @@ ggsave(paste0(resdir, "Nsig_spec_gn_fill.pdf"), width = 5, height = 4)
                axis.text.x = element_text(angle = 30, vjust = 0.6), 
                axis.title.x = element_blank()) +
          facet_grid(~ type, space = "free", scales = "free_x"))
-#ggsave(paste0(resdir, "Nsig_ess_gd-provsOnly_dodge.pdf"), width = 6, height = 4)
-ggsave(paste0(resdir, "Nsig_ess_gd-provsOnly_fill.pdf"), width = 5, height = 4)
+ggsave(paste0(resdir, "Nsig_ess_gd-provsOnly.pdf"), width = 5, height = 4)
 
 
 (pgn3 <- gn %>%
@@ -467,7 +461,6 @@ ggsave(paste0(resdir, "Nsig_ess_gd-provsOnly_fill.pdf"), width = 5, height = 4)
         summarize(n = n()) %>%
         mutate(n = ifelse(sign == "negative", -1*n, n)) %>% 
         ggplot(aes(x = protein, y = n, fill = essential)) +
-        #geom_bar(stat = "identity", position = "dodge") +
         geom_bar(stat = "identity") +
         geom_hline(yintercept = 0, color = "white") +
         ylab("Number of genes") +
@@ -480,8 +473,7 @@ ggsave(paste0(resdir, "Nsig_ess_gd-provsOnly_fill.pdf"), width = 5, height = 4)
               axis.text.x = element_text(angle = 30, vjust = 0.6), 
               axis.title.x = element_blank()) +
         facet_grid(~ type, space = "free", scales = "free_x"))
-#ggsave(paste0(resdir, "Nsig_ess_gn_dodge.pdf"), width = 6, height = 4)
-ggsave(paste0(resdir, "Nsig_ess_gn_fill.pdf"), width = 5, height = 4)
+ggsave(paste0(resdir, "Nsig_ess_gn.pdf"), width = 5, height = 4)
 
 
 
@@ -506,7 +498,6 @@ ggsave(paste0(resdir, "Nsig_ess_gn_fill.pdf"), width = 5, height = 4)
               set = forcats::fct_rev(set)) %>%
         mutate(n = ifelse(sign == "negative", -1*n, n)) %>% print() %>%
         ggplot(aes(x = protein, y = n, fill = set)) +
-        #geom_bar(stat = "identity", position = "dodge") +
         geom_bar(stat = "identity") +
         geom_hline(yintercept = 0, color = "white") +
         ylab("Number of gRNAs") +
@@ -515,14 +506,12 @@ ggsave(paste0(resdir, "Nsig_ess_gn_fill.pdf"), width = 5, height = 4)
         theme_bw() +
         theme(panel.grid.major = element_blank(), 
               panel.grid.minor = element_blank(),
-              #legend.position = "none",
               legend.title = element_blank(),
               legend.text = element_text(margin = margin(t = 3, b = 3, unit = "pt")),
               axis.text.x = element_text(angle = 30, vjust = 0.6), 
               axis.title.x = element_blank()) +
         facet_grid(~ type, space = "free", scales = "free_x"))
-#ggsave(paste0(resdir, "Nsig_set_gd_dodge.pdf"), width = 6.5, height = 4)
-ggsave(paste0(resdir, "Nsig_set_gd_fill.pdf"), width = 5.5, height = 4)
+ggsave(paste0(resdir, "Nsig_set_gd.pdf"), width = 5.5, height = 4)
 
 
 
