@@ -49,6 +49,25 @@ pie <- combdf.gn %>%
         mutate(ypos = cumsum(prop) - 0.5*prop ) %>% print()
 write_csv(pie, paste0(resdir, "Piechart.csv"))
 
+pie %>% mutate(FDR0.05_count = factor(FDR0.05_count, levels = c("8+", "7", "6", "5",
+                                                                "4", "3", "2", "1"))) %>%
+        ggplot(aes(x = "", y = prop, fill = FDR0.05_count)) +
+        geom_bar(stat = "identity", color = "black", size = 0.4) +
+        scale_fill_grey(start = 0.4, end = 0.98,  
+                        labels = c(paste0(pie$FDR0.05_count, " proteins affected (", round(pie$prop), "%)"))) +
+        labs(fill = "Number of proteins affected\nby gene perturbations with\nsignificant effect") +
+        theme_bw() +
+        theme(axis.title.x = element_blank(),
+              axis.title.y = element_blank(),
+              axis.text.x  = element_blank(),
+              axis.text.y  = element_blank(),
+              axis.ticks.x = element_blank(),
+              axis.ticks.y = element_blank(),
+              panel.grid.major = element_blank(), 
+              panel.grid.minor = element_blank(),
+              panel.border = element_blank())
+ggsave(paste0(resdir, "Piechart_bar.pdf"), width = 3, height = 3)
+
 pie %>% ggplot(aes(x = "", y = prop, fill = FDR0.05_count)) +
         geom_bar(stat = "identity", color = "black", size = 0.3) +
         coord_polar("y", start = 0) +
