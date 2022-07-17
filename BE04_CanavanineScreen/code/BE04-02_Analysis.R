@@ -174,6 +174,42 @@ fisher.test(res4.ns$provean5, res4.ns$enriched)
 
 # Plots ------------------------------------------------------------------------
 
+# Jitter plot
+res4 %>%
+        mutate(`Day 0_Control_log2fc`    = log2(`Day 0_Control`   /`Day 0_Control`),
+               `Day 1_Canavanine_log2fc` = log2(`Day 1_Canavanine`/`Day 0_Control`),
+               `Day 1_Control_log2fc`    = log2(`Day 1_Control`   /`Day 0_Control`),
+               `Day 2_Canavanine_log2fc` = log2(`Day 2_Canavanine`/`Day 0_Control`),
+               `Day 2_Control_log2fc`    = log2(`Day 2_Control`   /`Day 0_Control`)) %>%
+        select(-(`Day 0_Control`:`Day 0_Canavanine`)) %>%
+        pivot_longer(-c(guide, geneSys, gene, mut1, mut2, consequence, provean, 
+                        maxAbsProvean, enriched), 
+                     names_to = c("time", "condition", "remove"),
+                     names_sep = "_",
+                     values_to = "Log2FC") %>%
+        select(-remove) %>%
+        filter(!is.na(enriched)) %>% 
+        filter(condition != "Control") %>%
+        mutate(consequence = case_when(consequence == "synonymous" ~ "Synonymous",
+                                       consequence == "nonsynonymous" ~ "Missense",
+                                       consequence == "stop" ~ "Stop"),
+               consequence = factor(consequence, levels = c("Synonymous", "Missense", "Stop"))) %>%
+        mutate(time = case_when(time == "Day 0" ~ "0 hours",
+                                time == "Day 1" ~ "24 hours",
+                                time == "Day 2" ~ "48 hours")) %>%
+        ggplot(aes(x = consequence, y = Log2FC)) +
+        geom_hline(yintercept = 0, alpha = 0.2) +
+        geom_jitter(alpha = 0.3) +
+        geom_violin(trim = F, alpha = 0.2) +
+        labs(x = "", y = "Log2FC") +
+        facet_wrap(~ time) +
+        theme_bw() +
+        theme(panel.grid.major = element_blank(), 
+              panel.grid.minor = element_blank(),
+              axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+ggsave(paste0(resdir, "Jitter.pdf"), height = 3, width = 3)
+
+
 # Stacked columns
 res4 %>%
         pivot_longer(-c(guide, geneSys, gene, mut1, mut2, consequence, provean, maxAbsProvean, enriched), 
