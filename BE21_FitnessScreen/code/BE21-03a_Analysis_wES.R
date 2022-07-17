@@ -104,7 +104,7 @@ res4_gn %>%
 
 
 
-# Fitness jitter plot ----------------------------------------------------------
+# Fitness jitter plots ---------------------------------------------------------
 
 # Change names for sets and timepoints
 res5 <- res4 %>% 
@@ -125,19 +125,20 @@ res5 <- res4 %>%
                                      TRUE ~ NA_character_)) %>% print()
 
 res5 %>%
-        filter(timepoint == "48 hours") %>%
+        filter(timepoint != "32 hours") %>%
         filter(set %in% c("Non-yeast", "No C", "Synonymous", "Ess. stop")) %>%
         ggplot(aes(x = set, y = log2fc)) +
+        geom_hline(yintercept = 0, alpha = 0.2) +
         geom_jitter(alpha = 0.1) +
-        geom_violin(trim = T, alpha = 0.8) +
+        geom_violin(trim = T, alpha = 0.5) +
         labs(x = "", y = "Log2FC") +
-        #facet_wrap(~ timepoint) +
+        facet_wrap(~ timepoint) +
         theme_bw() +
         theme(panel.grid.major = element_blank(), 
               panel.grid.minor = element_blank(),
               axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
-ggsave(paste0(resdir, "wES_FitnessJitter_ESonly.pdf"), height = 3, width = 2)
-ggsave(paste0(resdir, "wES_FitnessJitter.pdf"), height = 3, width = 3)
+ggsave(paste0(resdir, "wES_FitnessJitter_ESonly.pdf"), height = 4, width = 4.5)
+ggsave(paste0(resdir, "wES_FitnessJitter.pdf"), height = 4, width = 6)
 
 
 
