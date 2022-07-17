@@ -199,15 +199,15 @@ res4 %>%
                                 time == "Day 2" ~ "48 hours")) %>%
         ggplot(aes(x = consequence, y = Log2FC)) +
         geom_hline(yintercept = 0, alpha = 0.2) +
-        geom_jitter(alpha = 0.3) +
-        geom_violin(trim = F, alpha = 0.2) +
+        geom_jitter(alpha = 0.2) +
+        geom_violin(trim = F, alpha = 0.3) +
         labs(x = "", y = "Log2FC") +
         facet_wrap(~ time) +
         theme_bw() +
         theme(panel.grid.major = element_blank(), 
               panel.grid.minor = element_blank(),
               axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
-ggsave(paste0(resdir, "Jitter.pdf"), height = 3, width = 3)
+ggsave(paste0(resdir, "Jitter.pdf"), height = 4, width = 3)
 
 
 # Stacked columns
