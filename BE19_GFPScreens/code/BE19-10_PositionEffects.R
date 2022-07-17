@@ -82,7 +82,7 @@ mutations %>%
                      names_sep = "_") %>%
         filter(q < 0.05) %>%
         filter(mutLocFromEnd < 200) %>% 
-        mutate(Stop = ifelse(set == "neStops", "neStops", "neProvs / eProvs")) %>% #print()
+        mutate(Stop = ifelse(set == "neStops", "Stop", "Missense")) %>% #print()
         ggplot(aes(x = mutLocFromEnd, y = abs(log2fc))) +
         geom_point() +
         geom_smooth(method = "loess") +
@@ -90,11 +90,13 @@ mutations %>%
         ylim(0, 2) +
         xlab("Distance from 3' end of gene (codons)") +
         ylab("Abs(log2FC)") +
+        #facet_wrap(~ Stop) +
         theme_bw() +
         theme(panel.grid.major = element_blank(), 
               panel.grid.minor = element_blank(),
               legend.position = "none")
 ggsave(paste0(resdir, "effectSize_scatter_loess_fromEnd.pdf"), width = 4, height = 4)
+ggsave(paste0(resdir, "effectSize_scatter_loess_fromEnd_facet.pdf"), width = 4, height = 4)
 
 
 # Relative gene position
@@ -103,7 +105,7 @@ mutations %>%
                      names_to = c("protein", ".value"),
                      names_sep = "_") %>%
         filter(q < 0.05) %>%
-        mutate(Stop = ifelse(set == "neStops", "neStops", "neProvs / eProvs")) %>% #print()
+        mutate(Stop = ifelse(set == "neStops", "Stop", "Missense")) %>% #print()
         ggplot(aes(x = mutLocRel, y = abs(log2fc))) +
         geom_point() +
         geom_smooth(method = "loess") +
