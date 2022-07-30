@@ -227,11 +227,15 @@ litCompScatter <- function(data, r1, r2, p1, p2, name1, name2,
                         segment.color = "darkgrey", segment.size = 0.5)} +
                 labs(x = paste0(name1, " et al."), y = paste0(name2, " et al.")) +
                 coord_cartesian(xlim = c(-xli, xli), ylim = c(-yli, yli)) +
+<<<<<<< HEAD
                 theme_bw() +
                 theme(legend.position = "none",
                       panel.grid.major = element_blank(), 
                       panel.grid.minor = element_blank())
         
+=======
+                theme(legend.position = "none")
+>>>>>>> b625ad3758c38d4d97c478fdab467c67c45e3490
         ggsave(paste0(resdir, name1, "-", name2, ".pdf"), width = 4, height = 4)
         
         return(dat)
@@ -241,28 +245,44 @@ litCompScatter <- function(data, r1, r2, p1, p2, name1, name2,
 litCompScatter(data = all.comb, 
                r1 = "log2fc.schubert", r2 = "log2fc.kemmeren",
                p1 = "q.schubert", p2 = "q.kemmeren", 
+<<<<<<< HEAD
                name1 = "This study", name2 = "Kemmeren", 
+=======
+               name1 = "Schubert", name2 = "Kemmeren", 
+>>>>>>> b625ad3758c38d4d97c478fdab467c67c45e3490
                p = 0.05, r = 0.5, xli = 4, yli = 4, 
                labels = c("Opposite"))
 
 litCompScatter(data = all.comb, 
                r1 = "log2fc.schubert", r2 = "log2fc.oduibhir",
                p1 = "q.schubert", p2 = "q.oduibhir", 
+<<<<<<< HEAD
                name1 = "This study", name2 = "Oduibhir", 
+=======
+               name1 = "Schubert", name2 = "Oduibhir", 
+>>>>>>> b625ad3758c38d4d97c478fdab467c67c45e3490
                p = 0.05, r = 0.5, xli = 4, yli = 4, 
                labels = c("Opposite"))
 
 litCompScatter(data = all.comb, 
                r1 = "log2fc.schubert", r2 = "log2fc.reimand",
                p1 = "q.schubert", p2 = "q.reimand", 
+<<<<<<< HEAD
                name1 = "This study", name2 = "Reimand", 
+=======
+               name1 = "Schubert", name2 = "Reimand", 
+>>>>>>> b625ad3758c38d4d97c478fdab467c67c45e3490
                p = 0.05, r = 0.5, xli = 4, yli = 4, 
                labels = c("Consistent", "Opposite"))
 
 litCompScatter(data = all.comb, 
                r1 = "log2fc.schubert", r2 = "log2fc.stefely",
                p1 = "q.schubert", p2 = "q.stefely", 
+<<<<<<< HEAD
                name1 = "This study", name2 = "Stefely", 
+=======
+               name1 = "Schubert", name2 = "Stefely", 
+>>>>>>> b625ad3758c38d4d97c478fdab467c67c45e3490
                p = 0.05, r = 0.5, xli = 4, yli = 4, 
                labels = c("Consistent", "Opposite"))
 
