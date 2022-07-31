@@ -26,25 +26,15 @@ readsdir <- "~/BigDataFiles/2021_ProteinGenetics/BE19/ReadsRDS/"
 
 # Data directory
 datadir <- "data/"
-dir.create(datadir)
 
 
 # Results directory
 resdir <- "results/"
-dir.create(resdir)
 
 
 # Processing directory
-procdir <- "results/processing/"
+procdir <- "results/processing_replComparison/"
 dir.create(procdir)
-
-
-# Copy read counts files into local data directory (datadir)
-countsfiles0 <- list.files(readsdir, pattern = ".*_ReadCounts.RDS", full.names = T); countsfiles0
-for(f in seq_along(countsfiles0)) {
-        file.copy(from = countsfiles0[f], to = datadir, overwrite = F)
-}
-rm(countsfiles0)
 
 
 # List of input files
@@ -84,37 +74,64 @@ badreps <- tibble(experiment = c("Eno2", "Fas1", "Fas2", "Htb2", "Rnr2",
                                    NA, NA, NA, NA, NA, NA)) #%>% print()
 
 
+# For replicate comparisons (reps A-D vs E-H):
+# Use a different combination for Fas2: BCE and FGH
+# Use a different combination for Tdh3: ABGH and CDEF
+
+badrepsABCD <- tibble(experiment = c("Eno2", "Fas1", "Fas2", "Htb2", "Rnr2", 
+                                     "Rpl9A", "Ssa1", "Tdh1", "Tdh2", "Tdh3", "Yhb1"),
+                      replicate = list(c("A", "E", "F", "G", "H"), c("A", "E", "F", "G", "H"),
+                                       c("A", "D", "F", "G", "H"), c("A", "E", "F", "G", "H"),
+                                       c("E", "F", "G", "H"), c("E", "F", "G", "H"),
+                                       c("E", "F", "G", "H"), c("E", "F", "G", "H"),
+                                       c("E", "F", "G", "H"), c("C", "D", "E", "F"),
+                                       c("E", "F", "G", "H"))) #%>% print()
+
+badrepsEFGH <- tibble(experiment = c("Eno2", "Fas1", "Fas2", "Htb2", "Rnr2", 
+                                     "Rpl9A", "Ssa1", "Tdh1", "Tdh2", "Tdh3", "Yhb1"),
+                      replicate = list(c("A", "B", "C", "D"), c("A", "B", "C", "D", "F"),
+                                       c("A", "B", "C", "D", "E"), c("A", "B", "C", "D"),
+                                       c("A", "B", "C", "D"), c("A", "B", "C", "D"),
+                                       c("A", "B", "C", "D"), c("A", "B", "C", "D"),
+                                       c("A", "B", "C", "D"), c("A", "B", "G", "H"),
+                                       c("A", "B", "C", "D"))) #%>% print()
+
+
 
 
 # Differential analysis of BC counts -------------------------------------------
 
-for(exp in seq_along(experiments)) {
+# To run this code for only 4 reps at a time, add reps to output folder name 
+# (line 114 and line 210), and specify the replicates to be excluded (line 144).
 
+for(exp in seq_along(experiments)) {
+        
         print(experiments[exp])
+        # exp = 1
         
         
         # Create results directory for experiment
-        diffdir <- paste0(procdir, experiments[exp], "_processing/")
+        diffdir <- paste0(procdir, experiments[exp], "_processing_ABCD/")
         dir.create(diffdir)
         
         
         # Convert read count table to long format
         rcounts <- readCountsLong(counts.file = countsfiles[exp], guide.info = guides)
-
-
+        
+        
         # Get unique BC counts per guide and sample
         BCcountsX <- rcounts %>%
                 filter(n_reads > 1) %>%  # Only keep BCs with >1 read
                 group_by(sample, guide) %>%
                 summarize(nBCs = n()) %>%
                 ungroup() #%>% print()
-
+        
         guidesToKeep <- BCcountsX %>%
                 filter(str_detect(sample, "un")) %>%
                 group_by(guide) %>%
                 summarize(moreBCs = sum(nBCs > 1)) %>%  # Keep only guides with >1 BC
                 filter(moreBCs > 4) #%>% print()        # in more than 4 "un" samples
-
+        
         BCcounts <- BCcountsX %>%
                 filter(guide %in% guidesToKeep$guide) %>%
                 pivot_wider(names_from = sample, values_from = nBCs ) %>%
@@ -124,10 +141,10 @@ for(exp in seq_along(experiments)) {
         
         
         # Remove replicates specified above to be excluded
-        excl <- badreps %>% filter(experiment == experiments[exp]) %>% 
+        excl <- badrepsABCD %>% filter(experiment == experiments[exp]) %>% 
                 pull("replicate") %>% .[[1]]
         if(!NA %in% excl) { BCcounts <- BCcounts[!BCcounts$repl %in% excl, ] }
-
+        
         
         # Save BCcounts        
         saveRDS(BCcounts, paste0(diffdir, "BCcounts.RDS"))
@@ -155,8 +172,8 @@ for(exp in seq_along(experiments)) {
         
         # Run Poisson generalized linear model (GLM) with log link function
         BCstats <- glmStats(BCcounts)
-
-
+        
+        
         # Convert to tibble
         BCstats <- BCstats[[1]] %>% as_tibble()
         
@@ -170,13 +187,14 @@ for(exp in seq_along(experiments)) {
         BCstats <- BCstats %>% mutate(log2fc = case_when(log2fc < -5 ~ -3,
                                                          log2fc >  5 ~  3,
                                                          TRUE ~ log2fc))
-
+        
         # Get q-values
         BCstats$q.value <- qvalue(BCstats$p.value)$qvalue
         
         
+        # Save BCstats
         saveRDS(BCstats, paste0(diffdir, "BCstats.RDS"))
-
+        
 }
 
 
@@ -189,7 +207,7 @@ for(exp in seq_along(experiments)) {
         print(experiments[exp])
         
         # Read in the BCstats.RDS file
-        diffdir  <- paste0(procdir, experiments[exp], "_processing/")
+        diffdir  <- paste0(procdir, experiments[exp], "_processing_ABCD/")
         BCstats  <- readRDS(paste0(diffdir, "BCstats.RDS"))
         BCcounts <- readRDS(paste0(diffdir, "BCcounts.RDS"))
         
@@ -204,20 +222,20 @@ for(exp in seq_along(experiments)) {
         pdf(paste0(diffdir, "pvalueHist.pdf"), width = 4, height = 4)
         hist(BCstats$p.value, breaks = 100)
         dev.off()
-
-
+        
+        
         # Plot volcano plot
         pdf(paste0(diffdir, "volcanoPlots.pdf"), width = 4, height = 4)
         plot(BCstats$log2fc, -log10(BCstats$p.value))
         dev.off()
-
-
+        
+        
         # Generate diagnostic qvalue plots
         pdf(paste0(diffdir, "qvaluePlots.pdf"), width = 5, height = 5)
         plot(qvalue(BCstats$p.value))
         dev.off()
-
-
+        
+        
         # Plot q-value distribution - not clear what to expect here
         pdf(paste0(diffdir, "qvalueHist.pdf"), width = 4, height = 4)
         hist(BCstats$q.value, breaks = 100)
@@ -243,7 +261,7 @@ for(exp in seq_along(experiments)) {
                 scale_x_continuous(trans = "log10") +
                 labs(x = "BCs per guide", y = "Q-value (Hi/Lo)")
         ggsave(paste0(diffdir, "qvalue-nBC.pdf"), width = 4, height = 4)
-
+        
         
         
         # Get gene-level stats -------------------------------------------------
@@ -271,7 +289,7 @@ for(exp in seq_along(experiments)) {
                 select(starts_with("q.")) %>%
                 ggpairs(aes(alpha = 0.3))
         ggsave(paste0(diffdir, "pvalue-comb_comparison.pdf"), plot = pl)
-
+        
         
         
         # Compile final guide results table ------------------------------------
@@ -299,5 +317,5 @@ for(exp in seq_along(experiments)) {
 
 # Session info -----------------------------------------------------------------
 
-writeLines(capture.output(sessionInfo()), "code/BE19-03_SessionInfo.txt")
+writeLines(capture.output(sessionInfo()), "code/BE19-03b_SessionInfo.txt")
 

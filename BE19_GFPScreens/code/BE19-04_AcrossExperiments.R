@@ -46,8 +46,7 @@ guides <- readRDS("../BE00_gRNALibraryDesign/results/guides.RDS") %>%
         filter(set %in% c("eProvs", "neProvs", "neStops")) %>%
         select(c("guide", "PAMstrand", "chr", "chr.start", "chr.end",
                  "mut1", "mut2", "mut3", "provean", "maxAbsProvean", 
-                 "essential", "set", "geneSys", "gene")) %>%
-        print()
+                 "essential", "set", "geneSys", "gene")) %>% print()
 
 
 # Gene annotations from SGD
@@ -126,7 +125,7 @@ combdf.gn <- combdf.gn %>%
 
 # Add more annotations for each gene
 combdf.gn <- right_join(sgd, combdf.gn, by = "geneSys") %>% 
-        relocate(gene, .after = geneSys) %>%print()
+        relocate(gene, .after = geneSys) %>% print()
 
 
 # Save table
