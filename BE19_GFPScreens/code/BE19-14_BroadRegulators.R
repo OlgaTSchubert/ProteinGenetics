@@ -35,7 +35,7 @@ gn <- combdf.gn %>%
 
 
 
-# Pie chart for fraction of genes by specificity -------------------------------
+# Stacked bar or pie chart for fraction of genes by specificity ----------------
 
 pie <- combdf.gn %>%
         filter(FDR0.05_count > 0) %>%
@@ -49,6 +49,7 @@ pie <- combdf.gn %>%
         mutate(ypos = cumsum(prop) - 0.5*prop ) %>% print()
 write_csv(pie, paste0(resdir, "Piechart.csv"))
 
+# Stacked bar chart
 pie %>% mutate(FDR0.05_count = factor(FDR0.05_count, levels = c("8+", "7", "6", "5",
                                                                 "4", "3", "2", "1"))) %>%
         ggplot(aes(x = "", y = prop, fill = FDR0.05_count)) +
@@ -68,6 +69,7 @@ pie %>% mutate(FDR0.05_count = factor(FDR0.05_count, levels = c("8+", "7", "6", 
               panel.border = element_blank())
 ggsave(paste0(resdir, "Piechart_bar.pdf"), width = 3, height = 3)
 
+# Pie chart
 pie %>% ggplot(aes(x = "", y = prop, fill = FDR0.05_count)) +
         geom_bar(stat = "identity", color = "black", size = 0.3) +
         coord_polar("y", start = 0) +
@@ -123,6 +125,57 @@ ggsave(paste0(resdir, "Heatmap_29.pdf"), width = 3.3, height = 5)
 # Combined plot
 p1 / p2   # library(patchwork)
 ggsave(paste0(resdir, "Heatmap_combined.pdf"), width = 3.3, height = 5.5)
+
+
+
+
+
+# Heatmap horizontal -----------------------------------------------------------
+
+(p1 <- gn %>%
+         filter(FDR0.05_count > 7) %>%
+         mutate(log2fc = case_when(log2fc >  1.5 ~  1.5,
+                                   log2fc < -1.5 ~ -1.5,
+                                   TRUE ~ log2fc)) %>%
+         ggplot() +
+         geom_tile(aes(x = gene, y = protein, fill = log2fc)) +
+         coord_equal() +
+         scale_fill_distiller(palette = "RdBu", name = "Log2FC", limit = c(-1.5, 1.5)) +
+         scale_y_discrete(limits = rev) +
+         labs(x = "Gene perturbation", y = "Protein") +
+         theme_bw() +
+         theme(legend.position = "none",
+               #axis.title.x = element_blank(),
+               #axis.title.y = element_blank(),
+               axis.text.x  = element_text(angle = 90, vjust = 0.5, hjust = 1),
+               panel.grid.major = element_blank(), 
+               panel.grid.minor = element_blank()))
+ggsave(paste0(resdir, "Heatmap_29_horizontal.pdf"), width = 5, height = 2.5)
+
+(p2 <- gn %>%
+                filter(gene %in% c("SIT4", "SAP155")) %>%
+                mutate(gene = factor(gene, levels = c("SIT4", "SAP155"))) %>%
+                mutate(log2fc = case_when(log2fc >  1.5 ~  1.5,
+                                          log2fc < -1.5 ~ -1.5,
+                                          TRUE ~ log2fc)) %>%
+                ggplot() +
+                geom_tile(aes(x = gene, y = protein, fill = log2fc)) +
+                coord_equal() +
+                scale_fill_distiller(palette = "RdBu", name = "Log2FC", limit = c(-1.5, 1.5)) +
+                scale_y_discrete(limits = rev) +
+                theme_bw() +
+                theme(axis.title.x = element_blank(),
+                      axis.title.y = element_blank(),
+                      axis.text.x  = element_text(angle = 90, vjust = 0.5, hjust = 1),
+                      axis.text.y  = element_blank(),
+                      axis.ticks.y = element_blank(),
+                      panel.grid.major = element_blank(), 
+                      panel.grid.minor = element_blank()))
+
+
+# Combined plot
+p1 | p2   # library(patchwork)
+ggsave(paste0(resdir, "Heatmap_combined_horizontal.pdf"), width = 5.5, height = 2.5)
 
 
 
