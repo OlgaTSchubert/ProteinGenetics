@@ -233,10 +233,10 @@ res4 %>%
               panel.grid.major = element_blank(), 
               panel.grid.minor = element_blank()) +
         facet_wrap(~ condition, )
-ggsave(paste0(resdir, "Columns3.pdf"), width = 4, height = 3)
+ggsave(paste0(resdir, "Columns3.pdf"), height = 3, width = 4)
 
 
-# Stacked columns (missense guides split up by enriched and nonenriched)
+# Stacked columns (missense guides split by conservation (PROVEAN score))
 res4 %>%
         pivot_longer(-c(guide, geneSys, gene, mut1, mut2, consequence, provean, maxAbsProvean, enriched), 
                      names_to = c("time", "condition"),
@@ -245,10 +245,10 @@ res4 %>%
         filter(!is.na(enriched)) %>%
         mutate(condition = factor(condition, levels = c("Control", "Canavanine")),
                consequence = case_when(consequence == "synonymous" ~ "Synonymous",
-                                       consequence == "nonsynonymous" & enriched == T ~ "Missense*",
-                                       consequence == "nonsynonymous" & enriched == F ~ "Missense",
+                                       consequence == "nonsynonymous" & maxAbsProvean > 5  ~ "Missense, conserved",
+                                       consequence == "nonsynonymous" & maxAbsProvean <= 5 ~ "Missense, less cons.",
                                        consequence == "stop" ~ "Stop"),
-               consequence = factor(consequence, levels = c("Synonymous", "Missense", "Missense*", "Stop"))) %>%
+               consequence = factor(consequence, levels = c("Synonymous", "Missense, less cons.", "Missense, conserved", "Stop"))) %>%
         mutate(time = case_when(time == "Day 0" ~ "0 hours",
                                 time == "Day 1" ~ "24 hours",
                                 time == "Day 2" ~ "48 hours")) %>%
@@ -261,7 +261,7 @@ res4 %>%
               panel.grid.major = element_blank(), 
               panel.grid.minor = element_blank()) +
         facet_wrap(~ condition, )
-ggsave(paste0(resdir, "Columns4.pdf"), width = 4, height = 3)
+ggsave(paste0(resdir, "Columns4.pdf"), height = 4, width = 4)
 
 
 
