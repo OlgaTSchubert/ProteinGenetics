@@ -123,8 +123,6 @@ comb %>%
 
 comb %>%
         filter(q_all < 0.05) %>% 
-        #filter(q_ABCD < 0.05 & q_EFGH < 0.05) %>%
-        #filter(q_ABCD < 0.05 | q_EFGH < 0.05) %>%
         ggplot(aes(x = log2fc_ABCD, y = log2fc_EFGH)) +
         geom_hline(yintercept = 0, alpha = 0.3) +
         geom_vline(xintercept = 0, alpha = 0.3) +
@@ -146,10 +144,10 @@ comb %>%
 
 ggsave(paste0(resdir, "ABCD-vs-EFGH_rep8-q0.05.jpg"), width = 4, height = 4)
 ggsave(paste0(resdir, "ABCD-vs-EFGH_rep8-q0.05.pdf"), width = 4, height = 4)
+ggsave(paste0(resdir, "ABCD-vs-EFGH_rep8-q0.05_sm.jpg"), width = 3, height = 3)
+ggsave(paste0(resdir, "ABCD-vs-EFGH_rep8-q0.05_sm.pdf"), width = 3, height = 3)
 ggsave(paste0(resdir, "ABCD-vs-EFGH_rep8-q0.05_facet.jpg"), width = 7, height = 6)
 ggsave(paste0(resdir, "ABCD-vs-EFGH_rep8-q0.05_facet.pdf"), width = 7, height = 6)
-#ggsave(paste0(resdir, "ABCD-vs-EFGH_either-q0.05.pdf"), width = 4, height = 4)
-#ggsave(paste0(resdir, "ABCD-vs-EFGH_both-q0.05.pdf"), width = 4, height = 4)
 
 
 
