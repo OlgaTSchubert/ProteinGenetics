@@ -19,8 +19,16 @@ readCountsLong <- function(counts.file, guide.info) {
                 unite(tail, repl, col = "sample", sep = ".", remove = F) %>%
                 arrange(sample, BCID)
         
+        # reads <- reads.w %>%
+        #         pivot_longer(-c(guide, geneSys, gene, set, barcode, BCID),
+        #                      names_to = "sample", values_to = "n_reads") %>%
+        #         separate(sample, into = c("tail", "repl"), remove = F) %>%
+        #         mutate(sample = str_replace(sample, "_", ".")) %>%
+        #         arrange(sample, BCID)
+        
         return(reads)
 }
+
 
 
 
@@ -60,7 +68,7 @@ glmStats <- function(BCCs = BCcounts) {
         # Initiate empty list to collect results for each guide
         statsHiLo   <- list()
         
-        # Intitiate progress bar
+        # Initiate progress bar
         pb <- txtProgressBar(min = 1, max = length(unique(BCCs$guide)), style = 3)
 
         # Loop through data, one guide at a time
@@ -87,4 +95,5 @@ glmStats <- function(BCCs = BCcounts) {
         
         return(statslist)
 }
+
 
