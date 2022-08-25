@@ -59,7 +59,7 @@ totsums <- res2 %>%
 
 
 # Normalize, log2fc, mean
-res3 <- res2 %>%
+res3a <- res2 %>%
         mutate(Tpre_A_norm = Tpre_A/totsums$Tpre_A*1E6,
                Tpre_B_norm = Tpre_B/totsums$Tpre_B*1E6,
                Tpre_C_norm = Tpre_C/totsums$Tpre_C*1E6,
@@ -95,6 +95,11 @@ res3 <- res2 %>%
         mutate(T00h_log2fc = rowMeans(cbind(T00h_A_log2fc, T00h_B_log2fc, T00h_C_log2fc, T00h_D_log2fc), na.rm = T),
                T08h_log2fc = rowMeans(cbind(T08h_A_log2fc, T08h_B_log2fc, T08h_C_log2fc, T08h_D_log2fc), na.rm = T),
                T24h_log2fc = rowMeans(cbind(T24h_A_log2fc, T24h_B_log2fc, T24h_C_log2fc, T24h_D_log2fc), na.rm = T)) %>%
+        print()
+saveRDS(res3a, paste0(resdir, "all4_Ratios_gd_allInfo.RDS"))
+
+
+res3 <- res3a %>%
         select(c(guide, set, geneSys, gene, T00h_log2fc:T24h_log2fc)) %>%
         print()
 write_excel_csv(res3, paste0(resdir, "all4_Ratios_gd_wide.csv"))
