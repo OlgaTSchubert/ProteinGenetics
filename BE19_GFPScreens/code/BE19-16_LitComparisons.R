@@ -182,12 +182,12 @@ stefely.comb <- stefely.r %>%
 
 all.comb <- schubert %>%
         left_join(kemmeren.comb, by = c("protein", "gene"), suffix = c(".schubert", ".kemmeren")) %>%
-        #left_join(oduibhir.comb, by = c("protein", "gene")) %>%
-        #rename(log2fc.oduibhir = log2fc, q.oduibhir = q) %>%
-        #left_join(reimand.comb, by = c("protein", "gene")) %>%
-        #rename(log2fc.reimand = log2fc, q.reimand = q) %>%
-        #left_join(stefely.comb, by = c("protein", "gene")) %>%
-        #rename(log2fc.stefely = log2fc, q.stefely = q) %>%
+        left_join(oduibhir.comb, by = c("protein", "gene")) %>%
+        rename(log2fc.oduibhir = log2fc, q.oduibhir = q) %>%
+        left_join(reimand.comb, by = c("protein", "gene")) %>%
+        rename(log2fc.reimand = log2fc, q.reimand = q) %>%
+        left_join(stefely.comb, by = c("protein", "gene")) %>%
+        rename(log2fc.stefely = log2fc, q.stefely = q) %>%
         print()
 
 
@@ -231,7 +231,7 @@ litCompScatter <- function(data, r1, r2, p1, p2, name1, name2,
                            aes(x = r1, y = r2), color = "royalblue3") +
                 geom_point(data = . %>% filter(Class.pr == "Opposite"),
                            aes(x = r1, y = r2), color = "cornflowerblue") +
-                {if (!is.null(labels)) geom_point(data = . %>% filter(gene %in% genestocolor),
+                {if (!is.null(genestocolor)) geom_point(data = . %>% filter(gene %in% genestocolor),
                            aes(x = r1, y = r2), color = "gold")} +
                 geom_smooth(data = . %>% filter(Class.pr %in% c("Consistent", "Opposite")),
                             aes(x = r1, y = r2), color = "grey25", 
@@ -245,7 +245,9 @@ litCompScatter <- function(data, r1, r2, p1, p2, name1, name2,
                         mapping = aes(x = r1, y = r2, label = paste0(gene, "\n(", protein, ")")),
                         size = 2, box.padding = 0.2, point.padding = 0.05,
                         segment.color = "darkgrey", segment.size = 0.5)} +
-                labs(x = paste0(name1, " et al."), y = paste0(name2, " et al.")) +
+                labs(x = name1, y = name2) +
+                # labs(x = ifelse(name1 == "This study", name1, paste0(name1, " et al.")), 
+                #      y = ifelse(name2 == "This study", name2, paste0(name2, " et al."))) +
                 coord_cartesian(xlim = c(-xli, xli), ylim = c(-yli, yli)) +
                 theme_bw() +
                 theme(legend.position = "none",
@@ -257,101 +259,61 @@ litCompScatter <- function(data, r1, r2, p1, p2, name1, name2,
         return(dat)
 }
 
-
-
-# chromatinOrganization = c("ADA2", "APC9", "ARP8", "ASF1", "BRE1", "BRE2", "CAC2", 
-#                           "CBF1", "CDC73", "CHD1", "CPR1", "CTI6", "CTR9", "DOC1", 
-#                           "DPB4", "EAF1", "ELP4", "FKH1", "GCN5", "HDA1", "HDA1", 
-#                           "HDA2", "HDA3", "HFI1", "HOS2", "HOS2", "HOS3", "HPC2", 
-#                           "HST3", "IES2", "IOC4", "ISW1", "ISW2", "ITC1", "LEO1", 
-#                           "LGE1", "MEC3", "MGA2", "MRC1", "MSH2", "MSI1", "MSN2", 
-#                           "NAP1", "NGG1", "NUP133", "NUP170", "NUP60", "RAD54", 
-#                           "REG1", "RSC1", "RSC2", "RTT106", "SEM1", "SET1", "SET2", 
-#                           "SET3", "SET4", "SGF11", "SGF29", "SIF2", "SIF2", "SNF2", 
-#                           "SNF5", "SNT1", "SNT1", "SPT21", "SPT3", "SPT7", "SPT8", 
-#                           "SWD1", "SWI3", "TUP1", "VPS71", "YAF9")
-
 litCompScatter(data = all.comb, 
                r1 = "log2fc.schubert", r2 = "log2fc.kemmeren",
                p1 = "q.schubert", p2 = "q.kemmeren", 
-               name1 = "This study", name2 = "Kemmeren", 
+               name1 = "Log2FC (This study)", name2 = "Log2FC (Kemmeren et al.)", 
                p = 0.05, r = 0.5, xli = 4, yli = 4, 
-               labels = NULL)
+               labels = NULL, 
+               genestocolor = NULL)
 
 litCompScatter(data = all.comb, 
                r1 = "log2fc.schubert", r2 = "log2fc.oduibhir",
                p1 = "q.schubert", p2 = "q.oduibhir", 
-               name1 = "This study", name2 = "Oduibhir", 
+               name1 = "Log2FC (This study)", name2 = "Log2FC (Oduibhir et al.)", 
                p = 0.05, r = 0.5, xli = 4, yli = 4, 
-               labels = c("Opposite"))
+               labels = c("Opposite"), 
+               genestocolor = NULL)
 
 litCompScatter(data = all.comb, 
                r1 = "log2fc.schubert", r2 = "log2fc.reimand",
                p1 = "q.schubert", p2 = "q.reimand", 
-               name1 = "This study", name2 = "Reimand", 
+               name1 = "Log2FC (This study)", name2 = "Log2FC (Reimand et al.)", 
                p = 0.05, r = 0.5, xli = 4, yli = 4, 
-               labels = c("Consistent", "Opposite"))
+               labels = c("Consistent", "Opposite"), 
+               genestocolor = NULL)
 
 litCompScatter(data = all.comb, 
                r1 = "log2fc.schubert", r2 = "log2fc.stefely",
                p1 = "q.schubert", p2 = "q.stefely", 
-               name1 = "This study", name2 = "Stefely", 
+               name1 = "Log2FC (This study)", name2 = "Log2FC (Stefely et al.)", 
                p = 0.05, r = 0.5, xli = 4, yli = 4, 
-               labels = c("Consistent", "Opposite"))
+               labels = c("Consistent", "Opposite"), 
+               genestocolor = NULL)
 
 litCompScatter(data = all.comb, 
                r1 = "log2fc.kemmeren", r2 = "log2fc.oduibhir",
                p1 = "q.kemmeren", p2 = "q.oduibhir", 
-               name1 = "Kemmeren", name2 = "Oduibhir", 
+               name1 = "Log2FC (Kemmeren et al.)", name2 = "Log2FC (Oduibhir et al.)", 
                p = 0.05, r = 0.5, xli = 4, yli = 4, 
-               labels = NULL)
+               labels = NULL, 
+               genestocolor = NULL)
 
 litCompScatter(data = all.comb, 
                r1 = "log2fc.kemmeren", r2 = "log2fc.reimand",
                p1 = "q.kemmeren", p2 = "q.reimand", 
-               name1 = "Kemmeren", name2 = "Reimand", 
+               name1 = "Log2FC (Kemmeren et al.)", name2 = "Log2FC (Reimand et al.)", 
                p = 0.05, r = 0.5, xli = 4, yli = 4, 
-               labels = c("Consistent", "Opposite"))
+               labels = c("Consistent", "Opposite"), 
+               genestocolor = NULL)
 
 litCompScatter(data = all.comb, 
                r1 = "log2fc.kemmeren", r2 = "log2fc.stefely",
                p1 = "q.kemmeren", p2 = "q.stefely", 
-               name1 = "Kemmeren", name2 = "Stefely", 
+               name1 = "Log2FC (Kemmeren et al.)", name2 = "Log2FC (Stefely et al.)", 
                p = 0.05, r = 0.5, xli = 4, yli = 4, 
-               labels = NULL)
-
-
-
-
-# Mediator heatmap
-
-mediator <- read_delim("annotations/Mediator.tsv", delim = "\t") %>% print()
-
-all.comb %>% 
-        pivot_longer(-c(gene, protein),
-                     names_to = c(".value", "study"),
-                     names_sep = "\\.") %>%
-        filter(q < 0.05 & abs(log2fc) > 0.5) %>%
-        filter(study %in% c("schubert", "kemmeren")) %>%
-        inner_join(mediator, by = "gene") %>%
-        mutate(gene    = factor(gene2, levels = rev(pull(mediator, gene2))),
-               set     = factor(set, levels = c("Cdk8", "Middle", "Head", "Tail")),
-               protein = factor(protein, levels = c("HTB2", "TDH1", "TDH2", "TDH3",
-                                                    "ENO2", "FAS1", "FAS2", "RNR2",
-                                                    "RPL9A", "SSA1", "YHB1"))) %>%
-        ggplot(aes(x = protein, y = gene, fill = log2fc)) +
-        geom_tile() +
-        scale_fill_distiller(palette = "RdBu", name = "Log2FC") +
-        facet_grid(set ~ study, space = "free", scales = "free_y") +
-        theme_bw() +
-        theme(legend.position = "none",
-              panel.grid.major = element_blank(), 
-              panel.grid.minor = element_blank(),
-              axis.title.x = element_blank(),
-              axis.title.y = element_blank(),
-              axis.text.x  = element_text(angle = 90, vjust = 0.5, hjust = 1))
-ggsave(paste0(resdir, "mediator_heatmap.pdf"), width = 4, height = 4)
-        
+               labels = NULL,
+               genestocolor = NULL)
 
 
 
