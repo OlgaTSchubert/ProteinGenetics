@@ -2,9 +2,9 @@
 
 ### About
 
-This repo accompanies the following paper published in eLife in 2022:
+This repo accompanies the following paper:
 
-Olga T. Schubert, Joshua S. Bloom, Meru J. Sadhu, Leonid Kruglyak. 2022. Genome-wide base editor screen identifies regulators of protein abundance in yeast. eLife
+Olga T. Schubert, Joshua S. Bloom, Meru J. Sadhu, Leonid Kruglyak. 2022. Genome-wide base editor screen identifies regulators of protein abundance in yeast. eLife 2022;11:e79525. DOI: https://doi.org/10.7554/eLife.79525
 
 ### Raw Data
 
